@@ -29,7 +29,7 @@
 
         <RadioButton x:Name="uiRadioEdit" Checked="uiRadio_Checked" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Entrer les informations"/>
         <Label Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Content="*Titre du film :"/>
-        <TextBox x:Name="uiTextTitle" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0,5,0" Height="25" Background="Blue"/>
+        <TextBox x:Name="uiTextTitle" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0,5,0" Height="25" />
         <Label Grid.Row="4" Grid.Column="1" Content="Genre :" VerticalAlignment="Top" HorizontalAlignment="Right"/>
         <ComboBox x:Name="uiComboBoxEdit" Grid.Row="4" Grid.Column="2" Height="25" VerticalAlignment="Top" Margin="5"/>
         <Button Grid.Row="4" Grid.Column="3" Content="Valider" Width="60" Height="25" VerticalAlignment="Bottom"/>

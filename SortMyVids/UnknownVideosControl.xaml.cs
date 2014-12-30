@@ -27,7 +27,16 @@ namespace SortMyVids
 
             uiRadioChoice.IsChecked = true;
 
+            initComboBoxChoice();
             initComboBoxEdit();
+        }
+
+        private void initComboBoxChoice()
+        {
+            foreach(TypeMovie t in (TypeMovie[]) Enum.GetValues(typeof(TypeMovie)))
+            {
+                uiComboBoxChoice.Items.Add(t);
+            }
         }
 
         private void initComboBoxEdit()

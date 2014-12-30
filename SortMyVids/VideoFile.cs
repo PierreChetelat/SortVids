@@ -11,10 +11,12 @@ using Newtonsoft.Json;
 
 namespace SortMyVids
 {
+    public enum TypeMovie
+    {
+        ACTION, HORROR, ADVENTURE, SCI_FI, FANTASTIQUE
+    }
     class VideoFile
     {
-        enum TypeMovie { ACTION, HORROR, ADVENTURE, SCI_FI, FANTASTIQUE };
-
         String oldPathName, newPathName;
         String videoName;
         String[] presumeVideoName;
