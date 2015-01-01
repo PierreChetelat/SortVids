@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
+using System.ComponentModel;
 
 namespace SortMyVids
 {
@@ -23,8 +25,20 @@ namespace SortMyVids
     {
 
         static string[] mediaExtensions = {
-            ".AVI", ".MP4", ".DIVX", ".WMV"
+            ".AVI", ".MP4", ".DIVX", ".WMV", ".MKV"
         };
+
+        static string[] mediaName = {
+            "720p","TRUEFRENCH","DVDRip","XviD","DTS","UTT"
+        };
+
+        static List<string> extensionMediaFilter = new List<string>();
+        static List<string> nameMediaFilter = new List<string>();
+
+        public static List<string> NameMediaFilter
+        {
+            get { return ResearchControl.nameMediaFilter; }
+        }
 
         List<VideoFile> myVideos = new List<VideoFile>();
 
@@ -33,13 +47,37 @@ namespace SortMyVids
         public ResearchControl()
         {
             InitializeComponent();
+            updateFilters();
         }
 
         private void uiButtonSrc_Click(object sender, RoutedEventArgs e)
         {
             directorySrc = showAndGetFolder();
             uiFolderSrc.Text = directorySrc;
-            getVideoFile(uiFolderSrc.Text);
+
+            if(directorySrc != "Choisir un dossier")
+            {
+                BackgroundWorker bw = new BackgroundWorker();
+
+                // define the event handlers
+                bw.DoWork += (objesender, args) => { getVideoFile(); };
+                bw.RunWorkerCompleted += (objesender, args) =>
+                {
+                    if (args.Error != null)  // if an exception occurred during DoWork,
+                    {
+                        uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
+                    }
+                    else
+                    {
+                        fillListVideoFile();
+                        uiLabelNBVideo.Content = myVideos.Count + " vidéo trouvés";
+                    }
+                };
+
+                uiLabelNBVideo.Content = "Recherche de vidéos...";
+
+                bw.RunWorkerAsync();
+            }
         }
 
         private void uiButtonDest_Click(object sender, RoutedEventArgs e)
@@ -63,14 +101,77 @@ namespace SortMyVids
             return "Choisir un dossier";
         }
 
-        private void getVideoFile(string pathDirectory)
+        private void getVideoFile()
         {
-            foreach (string path in Directory.GetFiles(pathDirectory, "*", SearchOption.AllDirectories))
-            {
-                if (Array.IndexOf(mediaExtensions, System.IO.Path.GetExtension(path).ToUpperInvariant()) != -1)
+            if(directorySrc != null)
+            { 
+                foreach (string path in Directory.GetFiles(directorySrc, "*", SearchOption.AllDirectories))
                 {
-                    myVideos.Add(new VideoFile(path));
+                    if (Array.IndexOf(extensionMediaFilter.ToArray(), System.IO.Path.GetExtension(path).ToUpperInvariant()) != -1)
+                    {
+                        VideoFile v = new VideoFile();
+                        v.setPath(path);
+                        myVideos.Add(v);
+                    }
                 }
+            }
+        }
+
+        private void fillListVideoFile()
+        {
+            foreach(VideoFile v in myVideos)
+            {
+                uiListMovie.Items.Add(v.VideoName);
+            }
+        }
+
+        private void uiButtonUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            updateFilters();
+        }
+
+        private void updateFilters()
+        {
+            string line;
+            //Lecture des filtres de noms
+            try
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader("./nameFilters.txt");
+
+                while ((line = file.ReadLine()) != null)
+                {
+                    nameMediaFilter.Add(line);
+                }
+
+                file.Close();
+
+            }
+            catch
+            {
+                //Valeurs par défauts
+                foreach (string s in mediaName)
+                    nameMediaFilter.Add(s);
+            }
+
+            //Lecture des filtres d'extensions
+            try
+            {
+
+                System.IO.StreamReader file = new System.IO.StreamReader("./extensionsFilters.txt");
+
+                while ((line = file.ReadLine()) != null)
+                {
+                    extensionMediaFilter.Add(line);
+                    Console.WriteLine(line);
+                }
+
+                file.Close();
+            }
+            catch
+            {
+                //Valeurs par défauts
+                foreach (string s in mediaExtensions)
+                    extensionMediaFilter.Add(s);
             }
         }
     }

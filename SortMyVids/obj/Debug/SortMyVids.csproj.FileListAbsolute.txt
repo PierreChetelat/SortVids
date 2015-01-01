@@ -19,3 +19,24 @@ D:\Niveau 3\NET Framework\Projet\SortMyVids\SortMyVids\obj\Debug\GeneratedIntern
 D:\Niveau 3\NET Framework\Projet\SortMyVids\SortMyVids\obj\Debug\SortMyVids_MarkupCompile.lref
 D:\Niveau 3\NET Framework\Projet\SortMyVids\SortMyVids\obj\Debug\UnknownVideosControl.baml
 D:\Niveau 3\NET Framework\Projet\SortMyVids\SortMyVids\obj\Debug\UnknownVideosControl.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\bin\Debug\SortMyVids.exe.config
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.exe
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.pdb
+C:\PROJET_NET\SortVids\SortMyVids\bin\Debug\SortMyVids.exe
+C:\PROJET_NET\SortVids\SortMyVids\bin\Debug\SortMyVids.pdb
+C:\PROJET_NET\SortVids\SortMyVids\bin\Debug\Newtonsoft.Json.dll
+C:\PROJET_NET\SortVids\SortMyVids\bin\Debug\Newtonsoft.Json.xml
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.csprojResolveAssemblyReference.cache
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\ResearchControl.baml
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\UnknownVideosControl.baml
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\MainWindow.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\ResearchControl.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\UnknownVideosControl.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\App.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids_MarkupCompile.cache
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids_MarkupCompile.lref
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\MainWindow.baml
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.g.resources
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.Properties.Resources.resources
+C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.csproj.GenerateResource.Cache

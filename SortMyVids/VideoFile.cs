@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace SortMyVids
 {
@@ -18,8 +19,9 @@ namespace SortMyVids
     class VideoFile
     {
         String oldPathName, newPathName;
-        String videoName;
-        String[] presumeVideoName;
+        String videoName, videoYear;
+        List<string> presumeVideoName;
+        List<VideoFile> presumeVideo;
 
         TypeMovie genre;
 
@@ -28,56 +30,105 @@ namespace SortMyVids
             get { return videoName; }
             set { videoName = value; }
         }
+        public String VideoYear
+        {
+            get { return videoYear; }
+            set { videoYear = value; }
+        }
 
-        public VideoFile(string path)
+        public VideoFile()
+        {
+            presumeVideoName = new List<string>();
+        }
+
+        public void setPath(string path)
         {
             oldPathName = path;
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
-            searchGenre();
         }
 
         private void cleanTitle()
         {
+            string tmpName = videoName;
 
-        }
+            //First step : eliminate false name with filter
+            foreach (string s in ResearchControl.NameMediaFilter)
+                tmpName.Replace(s, "");
 
-        private void searchGenre()
-        {
-            var t = Task.Factory.StartNew<String>(() => doAction());
-            string result = t.Result;
-            Console.WriteLine("Resultat :" + result);
-            string[] tab = { result };
-            //ComboBoxDialog.ShowDialog(tab);
-        }
-
-        private string doAction()
-        {
-            string title = "matrix";
-            string annee = "";
-            string requete = "http://www.omdbapi.com/?t=" + title + "&y=" + annee + "&plot=short&r=json";
-
-            WebRequest request = WebRequest.Create(requete);
-            WebResponse r = request.GetResponse();
-
-            StreamReader objReader = new StreamReader(r.GetResponseStream());
-
-            string sLine = "", result = "";
-            int i = 0;
-
-            while (sLine != null)
+            //title sometimes delimited by year
+            string[] resultAll = Regex.Split(tmpName, "[0-9]{4}");
+            if(resultAll != null)
             {
-                i++;
-                sLine = objReader.ReadLine();
-                if (sLine != null)
-                    result += sLine;
+                //if there is date, get the name separate by '.'
+                string[] resultName = resultAll[0].Split('.');
+
+                addInPresumeName(resultName);
             }
+            //If there is no date, maybe delimited by '-'
+            else
+            {
+                string[] resultName = tmpName.Split('-');
+                
+                if(resultName != null)
+                {
+                    addInPresumeName(resultName);
+                }
+                //Or by '.'
+                else
+                {
+                    resultName = tmpName.Split('.');
 
-            Newtonsoft.Json.Linq.JToken token = Newtonsoft.Json.Linq.JObject.Parse(result);
+                    addInPresumeName(resultName);
+                }
+            }
+        }
 
-            string titreTrouve = (string)token.SelectToken("Title");
-            string anneTrouve = (string)token.SelectToken("Year");
+        private void addInPresumeName(string[] tab)
+        {
+            foreach (string s in tab)
+                presumeVideoName.Add(s);
+        }
 
-            return titreTrouve + " : " + anneTrouve;
+        public void searchGenre()
+        {
+            Task.Factory.StartNew(() => doAction());
+        }
+
+        private void doAction()
+        {
+            foreach(string s in presumeVideoName)
+            {
+                string requete = "http://www.omdbapi.com/?t=" + s + "&y=&plot=short&r=json";
+
+                WebRequest request = WebRequest.Create(requete);
+                WebResponse r = request.GetResponse();
+
+                StreamReader objReader = new StreamReader(r.GetResponseStream());
+
+                string sLine = "", result = "";
+
+                while (sLine != null)
+                {
+                    sLine = objReader.ReadLine();
+                    if (sLine != null)
+                        result += sLine;
+                }
+
+                Newtonsoft.Json.Linq.JToken token = Newtonsoft.Json.Linq.JObject.Parse(result);
+
+                string titreTrouve = (string)token.SelectToken("Title");
+                string anneTrouve = (string)token.SelectToken("Year");
+
+                if(titreTrouve != null && anneTrouve != null)
+                { 
+                    VideoFile v = new VideoFile();
+                    v.VideoName = titreTrouve;
+                    v.VideoYear = anneTrouve;
+
+                    presumeVideo.Add(v);
+                }
+            }
+            
             throw new NotImplementedException();
         }
     }
