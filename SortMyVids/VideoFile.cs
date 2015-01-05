@@ -25,10 +25,23 @@ namespace SortMyVids
     {
         String oldPathName, newPathName;
         String videoName, videoYear;
+        //Utiliser pour rechercher les noms de films possibles
         List<string> presumeVideoName;
+        //Remplis par les noms présumé, contient les infos sur les films possibles
         List<VideoFile> presumeVideo;
+        Boolean isVerified;
 
         TypeMovie genre;
+
+        public List<VideoFile> PresumeVideo
+        {
+            get { return presumeVideo; }
+        }
+        public Boolean IsVerified
+        {
+            get { return isVerified; }
+            set { isVerified = value; }
+        }
 
         public String VideoName
         {
@@ -44,12 +57,15 @@ namespace SortMyVids
         public VideoFile()
         {
             presumeVideoName = new List<string>();
+            isVerified = false;
         }
 
         public void setPath(string path)
         {
             oldPathName = path;
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
+            videoYear = "";
+            cleanTitle();
         }
 
         private void cleanTitle()
@@ -60,6 +76,11 @@ namespace SortMyVids
             foreach (string s in ResearchControl.NameMediaFilter)
                 tmpName.Replace(s, "");
 
+            videoName = tmpName;
+
+            //Maybe the right title ?
+            presumeVideoName.Add(videoName);
+            
             //title sometimes delimited by year
             string[] resultAll = Regex.Split(tmpName, "[0-9]{4}");
             if(resultAll != null)
@@ -86,28 +107,38 @@ namespace SortMyVids
                     presumeVideoName.Add(presumeName);
                 }
             }
+
+            //Suppression des doublons
+            presumeVideoName = presumeVideoName.Distinct() as List<string>;
         }
 
         private void addInPresumeName(string[] tab)
         {
             foreach (string s in tab)
-                presumeVideoName.Add(s);
+            {
+                if(s != null)
+                    presumeVideoName.Add(s);
+            }
         }
 
         public void searchGenre()
         {
-            Task.Factory.StartNew(() => doAction());
+            Console.WriteLine("ON LANCE");
+            //Task.Factory.StartNew(() => doAction());
+            doAction();
         }
 
         private void doAction()
         {
             foreach(string s in presumeVideoName)
             {
-                string requete = "http://www.omdbapi.com/?t=" + s + "&y=&plot=short&r=json";
+                Console.WriteLine("do1");
+                string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
 
                 WebRequest request = WebRequest.Create(requete);
                 WebResponse r = request.GetResponse();
 
+                Console.WriteLine("do2");
                 StreamReader objReader = new StreamReader(r.GetResponseStream());
 
                 string sLine = "", result = "";
@@ -124,6 +155,7 @@ namespace SortMyVids
                 string titreTrouve = (string)token.SelectToken("Title");
                 string anneTrouve = (string)token.SelectToken("Year");
 
+                Console.WriteLine("TITRE " + titreTrouve + " ANNEE " + anneTrouve);
                 if(titreTrouve != null && anneTrouve != null)
                 { 
                     VideoFile v = new VideoFile();
@@ -131,10 +163,17 @@ namespace SortMyVids
                     v.VideoYear = anneTrouve;
 
                     presumeVideo.Add(v);
+                    Console.WriteLine("TITRE TROUVE");
                 }
+
             }
             
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return videoName;
         }
     }
 }

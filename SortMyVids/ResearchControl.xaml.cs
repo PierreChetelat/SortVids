@@ -40,7 +40,14 @@ namespace SortMyVids
             get { return ResearchControl.nameMediaFilter; }
         }
 
-        List<VideoFile> myVideos = new List<VideoFile>();
+        List<VideoFile> listMyVideos = new List<VideoFile>();
+
+        internal List<VideoFile> ListMyVideos
+        {
+            get { return listMyVideos; }
+            set { listMyVideos = value; }
+        }
+
 
         string directorySrc, directoryDest;
 
@@ -59,7 +66,7 @@ namespace SortMyVids
             {
                 BackgroundWorker bw = new BackgroundWorker();
 
-                // define the event handlers
+                // define the event handlers, work in other thread
                 bw.DoWork += (objesender, args) => { getVideoFile(); };
                 bw.RunWorkerCompleted += (objesender, args) =>
                 {
@@ -67,10 +74,11 @@ namespace SortMyVids
                     {
                         uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
                     }
+                    //Work in UI THREAD
                     else
                     {
                         fillListVideoFile();
-                        uiLabelNBVideo.Content = myVideos.Count + " vidéo trouvés";
+                        uiLabelNBVideo.Content = listMyVideos.Count + " vidéo trouvés";
                     }
                 };
 
@@ -111,7 +119,7 @@ namespace SortMyVids
                     {
                         VideoFile v = new VideoFile();
                         v.setPath(path);
-                        myVideos.Add(v);
+                        listMyVideos.Add(v);
                     }
                 }
             }
@@ -119,9 +127,9 @@ namespace SortMyVids
 
         private void fillListVideoFile()
         {
-            foreach(VideoFile v in myVideos)
+            foreach(VideoFile v in listMyVideos)
             {
-                uiListMovie.Items.Add(v.VideoName);
+                uiListMovie.Items.Add(v);
             }
         }
 
