@@ -66,7 +66,6 @@ namespace SortMyVids
 
         private void cleanTitle()
         {
-            Console.WriteLine("AJOUT DU TITRE");
             string tmpName = videoName;
 
             //First step : eliminate false name with filter
@@ -104,32 +103,38 @@ namespace SortMyVids
                     addInPresumeName(resultName);
                 }
             }
+
+            //Suppression des doublons
+            presumeVideoName = presumeVideoName.Distinct() as List<string>;
         }
 
         private void addInPresumeName(string[] tab)
         {
             foreach (string s in tab)
             {
-                Console.WriteLine("AJOUT DU TITRE " + s);
-                presumeVideoName.Add(s);
+                if(s != null)
+                    presumeVideoName.Add(s);
             }
         }
 
         public void searchGenre()
         {
             Console.WriteLine("ON LANCE");
-            Task.Factory.StartNew(() => doAction());
+            //Task.Factory.StartNew(() => doAction());
+            doAction();
         }
 
         private void doAction()
         {
             foreach(string s in presumeVideoName)
             {
+                Console.WriteLine("do1");
                 string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
 
                 WebRequest request = WebRequest.Create(requete);
                 WebResponse r = request.GetResponse();
 
+                Console.WriteLine("do2");
                 StreamReader objReader = new StreamReader(r.GetResponseStream());
 
                 string sLine = "", result = "";
@@ -146,6 +151,7 @@ namespace SortMyVids
                 string titreTrouve = (string)token.SelectToken("Title");
                 string anneTrouve = (string)token.SelectToken("Year");
 
+                Console.WriteLine("TITRE " + titreTrouve + " ANNEE " + anneTrouve);
                 if(titreTrouve != null && anneTrouve != null)
                 { 
                     VideoFile v = new VideoFile();
@@ -155,10 +161,10 @@ namespace SortMyVids
                     presumeVideo.Add(v);
                     Console.WriteLine("TITRE TROUVE");
                 }
-                Console.WriteLine("PARCOURS");
+
             }
             
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public override string ToString()

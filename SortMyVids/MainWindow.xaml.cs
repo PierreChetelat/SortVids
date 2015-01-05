@@ -15,11 +15,14 @@ using System.Windows.Shapes;
 
 using System.IO;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace SortMyVids
 {
     public partial class MainWindow : Window
     {
+        List<VideoFile> listTmp = new List<VideoFile>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,22 +32,45 @@ namespace SortMyVids
 
         void uiButtonLaunch_Click(object sender, RoutedEventArgs e)
         {
-            List<VideoFile> listTmp = new List<VideoFile>();
+            listTmp = new List<VideoFile>();
+       
+            BackgroundWorker bw = new BackgroundWorker();
+
+            // define the event handlers, work in other thread
+            bw.DoWork += (objesender, args) => { getGenre(); };
+            bw.RunWorkerCompleted += (objesender, args) =>
+            {
+                if (args.Error != null)  // if an exception occurred during DoWork,
+                {
+                }
+                //Work in UI THREAD
+                else
+                {
+                    uiUnknownVideosControl.ListUnknownVideo = listTmp;
+                }
+            };
+
             
+            bw.RunWorkerAsync();
+
+
+        }
+
+        public void getGenre()
+        {
+            Console.WriteLine("1");
             foreach(VideoFile v in uiResearchControl.ListMyVideos)
             {
                 v.searchGenre();
-
             }
+            Console.WriteLine("2");
 
             foreach (VideoFile v in uiResearchControl.ListMyVideos)
             {
                 if (!v.IsVerified)
                     listTmp.Add(v);
             }
-
-            uiUnknownVideosControl.ListUnknownVideo = listTmp;
+            Console.WriteLine("3");
         }
-
     }
 }

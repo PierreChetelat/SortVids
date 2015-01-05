@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MyWebRequest.cs" />
     <Compile Include="ResearchControl.xaml.cs">
       <DependentUpon>ResearchControl.xaml</DependentUpon>
     </Compile>

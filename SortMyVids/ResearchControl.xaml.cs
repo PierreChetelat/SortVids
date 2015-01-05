@@ -66,7 +66,7 @@ namespace SortMyVids
             {
                 BackgroundWorker bw = new BackgroundWorker();
 
-                // define the event handlers
+                // define the event handlers, work in other thread
                 bw.DoWork += (objesender, args) => { getVideoFile(); };
                 bw.RunWorkerCompleted += (objesender, args) =>
                 {
@@ -74,6 +74,7 @@ namespace SortMyVids
                     {
                         uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
                     }
+                    //Work in UI THREAD
                     else
                     {
                         fillListVideoFile();
