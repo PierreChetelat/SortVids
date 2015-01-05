@@ -11,7 +11,7 @@
                         <TextBlock Text="General"/>
                     </StackPanel>
                 </TabItem.Header>
-                <my:ResearchControl Margin="5"/>
+                <my:ResearchControl x:Name="uiResearchControl" Margin="5"/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -19,7 +19,7 @@
                         <TextBlock Text="Unknown files"/>
                     </StackPanel>
                 </TabItem.Header>
-                <my:UnknownVideosControl Margin="5"/>
+                <my:UnknownVideosControl x:Name="uiUnknownVideosControl" Margin="5"/>
             </TabItem>
 
         </TabControl>

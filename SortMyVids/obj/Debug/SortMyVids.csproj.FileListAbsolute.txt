@@ -40,3 +40,24 @@ C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\MainWindow.baml
 C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.g.resources
 C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.Properties.Resources.resources
 C:\PROJET_NET\SortVids\SortMyVids\obj\Debug\SortMyVids.csproj.GenerateResource.Cache
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\bin\Debug\SortMyVids.exe.config
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.exe
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.pdb
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\bin\Debug\SortMyVids.exe
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\bin\Debug\SortMyVids.pdb
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\bin\Debug\Newtonsoft.Json.dll
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\bin\Debug\Newtonsoft.Json.xml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.csprojResolveAssemblyReference.cache
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\ResearchControl.baml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\UnknownVideosControl.baml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\MainWindow.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\ResearchControl.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\UnknownVideosControl.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\App.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids_MarkupCompile.cache
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids_MarkupCompile.lref
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\MainWindow.baml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.g.resources
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.Properties.Resources.resources
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.csproj.GenerateResource.Cache

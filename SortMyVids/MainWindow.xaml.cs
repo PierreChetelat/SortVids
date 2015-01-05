@@ -20,10 +20,30 @@ namespace SortMyVids
 {
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
+
+            uiResearchControl.uiButtonLaunch.Click += uiButtonLaunch_Click;
+        }
+
+        void uiButtonLaunch_Click(object sender, RoutedEventArgs e)
+        {
+            List<VideoFile> listTmp = new List<VideoFile>();
+            
+            foreach(VideoFile v in uiResearchControl.ListMyVideos)
+            {
+                v.searchGenre();
+
+            }
+
+            foreach (VideoFile v in uiResearchControl.ListMyVideos)
+            {
+                if (!v.IsVerified)
+                    listTmp.Add(v);
+            }
+
+            uiUnknownVideosControl.ListUnknownVideo = listTmp;
         }
 
     }

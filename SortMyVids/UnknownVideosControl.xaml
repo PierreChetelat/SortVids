@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <Label Content="Liste des films introuvables :"/>
-        <ListBox x:Name="uiListUnknownVideo" Grid.RowSpan="5" Margin="5,30,5,5"/>
+        <ListBox x:Name="uiListUnknownVideo" SelectionChanged="uiListUnknownVideo_SelectionChanged" Grid.RowSpan="5" Margin="5,30,5,5"/>
         <RadioButton x:Name="uiRadioChoice" Checked="uiRadio_Checked" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Choix du titre proposé"/>
         <ComboBox x:Name="uiComboBoxChoice" Grid.Row="1" Grid.Column="2" Height="25"  Margin="5,0,5,0"/>
         <Button x:Name="uiButtonValidateChoice" Grid.Row="1" Grid.Column="3" Content="Valider" Width="60" Height="25" />
