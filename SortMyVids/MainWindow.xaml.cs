@@ -32,45 +32,47 @@ namespace SortMyVids
 
         void uiButtonLaunch_Click(object sender, RoutedEventArgs e)
         {
-            listTmp = new List<VideoFile>();
-       
             BackgroundWorker bw = new BackgroundWorker();
 
             // define the event handlers, work in other thread
-            bw.DoWork += (objesender, args) => { getGenre(); };
+            bw.DoWork += worker_DoWork;
             bw.RunWorkerCompleted += (objesender, args) =>
             {
                 if (args.Error != null)  // if an exception occurred during DoWork,
                 {
+                    Console.WriteLine("PAS REUSSI");
                 }
                 //Work in UI THREAD
                 else
                 {
-                    uiUnknownVideosControl.ListUnknownVideo = listTmp;
+                    Console.WriteLine("REUSSI");
+                    uiUnknownVideosControl.ListUnknownVideo = args.Result as List<VideoFile>;
                 }
             };
 
             
-            bw.RunWorkerAsync();
-
+            bw.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
 
         }
-
-        public void getGenre()
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Console.WriteLine("1");
-            foreach(VideoFile v in uiResearchControl.ListMyVideos)
+            Console.WriteLine("Recup de la liste");
+            List<VideoFile> list = e.Argument as List<VideoFile>;
+            Console.WriteLine("taille : "+list.Count);
+
+            foreach (VideoFile v in list)
             {
                 v.searchGenre();
             }
-            Console.WriteLine("2");
-
-            foreach (VideoFile v in uiResearchControl.ListMyVideos)
+            
+            foreach (VideoFile v in list)
             {
                 if (!v.IsVerified)
                     listTmp.Add(v);
             }
-            Console.WriteLine("3");
+
+            e.Result = list;
         }
+
     }
 }
