@@ -14,7 +14,11 @@ namespace SortMyVids
 {
     public enum TypeMovie
     {
-        ACTION, HORROR, ADVENTURE, SCI_FI, FANTASTIQUE
+        ACTION, ANIMATION, COMEDY, DOCUMENTARY,
+        FAMILY, FILM_NOIR, HORROR, MUSICAL, ROMANCE,
+        SPORT, WAR, ADVENTURE, BIOGRAPHY, CRIME,
+        DRAMA, FANTASY, HISTORY, MUSIC, MYSTERY,
+        SCI_FI, THRILLER, WESTERN
     }
 
     class VideoFile
@@ -94,9 +98,9 @@ namespace SortMyVids
             if(resultAll != null)
             {
                 //if there is date, get the name separate by '.'
-                string[] resultName = resultAll[0].Split('.');
+                string resultName = resultAll[0].Replace('.',' ');
 
-                addInPresumeName(resultName);
+                presumeVideoName.Add(resultName);
             }
             //If there is no date, maybe delimited by '-'
             else
@@ -110,9 +114,9 @@ namespace SortMyVids
                 //Or by '.'
                 else
                 {
-                    resultName = tmpName.Split('.');
+                    string presumeName = tmpName.Replace('.',' ');
 
-                    addInPresumeName(resultName);
+                    presumeVideoName.Add(presumeName);
                 }
             }
 
