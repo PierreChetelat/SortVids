@@ -22,7 +22,11 @@ namespace SortMyVids
         internal List<VideoFile> ListUnknownVideo
         {
             get { return listUnknownVideo; }
-            set { listUnknownVideo = value; }
+            set { listUnknownVideo = value;
+                  //Binding view - list
+                  uiListUnknownVideo.ItemsSource = listUnknownVideo;
+                  uiListUnknownVideo.SelectedItem = uiListUnknownVideo.Items.GetItemAt(0);
+                }
         }
     
         public UnknownVideosControl()
@@ -30,18 +34,20 @@ namespace SortMyVids
             InitializeComponent();
 
             listUnknownVideo = new List<VideoFile>();
-            //Binding view - list
-            uiListUnknownVideo.ItemsSource = listUnknownVideo;
 
             //Choix de base
             uiRadioChoice.IsChecked = true;
 
             //initComboBoxChoice();
             initComboBoxEdit();
+
+            
         }
         
         private void initComboBoxChoice(VideoFile v)
         {
+            uiComboBoxChoice.Items.Clear();
+
             foreach (VideoFile tmp in v.PresumeVideo)
             {
                 uiComboBoxChoice.Items.Add(tmp);
@@ -56,12 +62,13 @@ namespace SortMyVids
             }
         }
 
-        private void fillUnknownVideo()
+        private void initComboBoxEdit(VideoFile v)
         {
-            foreach(VideoFile v in listUnknownVideo)
+            if(v.IsVerified)
             {
-                if(!v.IsVerified)
-                    uiListUnknownVideo.Items.Add(v);
+                uiTextTitle.Text = v.VideoName;
+                uiComboBoxEdit.SelectedItem = v.Genre;
+                uiTextYear.Text = v.VideoYear;
             }
         }
 
@@ -70,24 +77,84 @@ namespace SortMyVids
             if(uiRadioEdit.IsChecked == true)
             {
                 uiComboBoxChoice.IsEnabled = false;
+                uiButtonValidateChoice.IsEnabled = false;
                 uiTextTitle.IsEnabled = true;
                 uiComboBoxEdit.IsEnabled = true;
+                uiButtonValidateEdit.IsEnabled = true;
             }
             else
             {
                 uiTextTitle.IsEnabled = false;
                 uiComboBoxEdit.IsEnabled = false;
+                uiButtonValidateEdit.IsEnabled = false;
                 uiComboBoxChoice.IsEnabled = true;
+                uiButtonValidateChoice.IsEnabled = true;
             }
         }
 
         private void uiListUnknownVideo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            VideoFile v = sender as VideoFile;
+            VideoFile v = uiListUnknownVideo.SelectedItem as VideoFile;
+
             if (v != null)
             {
+                initComboBoxChoice(v);
+                initComboBoxEdit(v);
             }
         }
-    
+
+        private void uiButtonValidateChoice_Click(object sender, RoutedEventArgs e)
+        {
+            VideoFile v = getSelectedVideoFile();
+            VideoFile vNew = uiComboBoxChoice.SelectedItem as VideoFile;
+
+            if(vNew != null)
+            {
+                v.VideoName = vNew.VideoName;
+                v.VideoYear = vNew.VideoYear;
+                v.IsVerified = true;
+                nextSelectedUnknownItem();
+            } 
+        }
+
+        private void uiButtonValidateEdit_Click(object sender, RoutedEventArgs e)
+        {
+            VideoFile v = getSelectedVideoFile();
+
+            string title = uiTextTitle.Text;
+            string year = uiTextTitle.Text;
+
+            if (title.Length > 0) 
+            { 
+                v.VideoName = uiTextTitle.Text;
+                v.VideoYear = uiTextYear.Text;
+                v.IsVerified = true;
+                nextSelectedUnknownItem();
+            }
+        }    
+
+        private VideoFile getSelectedVideoFile()
+        {
+            int index = listUnknownVideo.IndexOf(uiListUnknownVideo.SelectedItem as VideoFile);
+            return listUnknownVideo.ElementAt(index);
+        }
+
+        private void nextSelectedUnknownItem()
+        {
+            uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1; 
+            clearTextEdit();
+            
+
+
+
+            //?????????????????
+            uiListUnknownVideo.UpdateLayout();
+        }
+
+        private void clearTextEdit()
+        {
+            uiTextTitle.Clear();
+            uiTextYear.Clear();
+        }
     }
 }

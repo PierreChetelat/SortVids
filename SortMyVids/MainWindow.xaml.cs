@@ -27,10 +27,16 @@ namespace SortMyVids
         {
             InitializeComponent();
 
-            uiResearchControl.uiButtonLaunch.Click += uiButtonLaunch_Click;
+            uiResearchControl.uiButtonLaunchAnalysis.Click += uiButtonLaunchAnalysis_Click;
+            uiResearchControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
         }
 
-        void uiButtonLaunch_Click(object sender, RoutedEventArgs e)
+        void uiButtonLaunchExecution_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
         {
             BackgroundWorker bw = new BackgroundWorker();
 
@@ -38,15 +44,15 @@ namespace SortMyVids
             bw.DoWork += worker_DoWork;
             bw.RunWorkerCompleted += (objesender, args) =>
             {
-                if (args.Error != null)  // if an exception occurred during DoWork,
+                if (args.Error != null)  // if an exception occurred during DoWork
                 {
-                    Console.WriteLine("PAS REUSSI");
+                    //TODO : MESSAGE ERREUR
                 }
                 //Work in UI THREAD
                 else
                 {
-                    Console.WriteLine("REUSSI");
                     uiUnknownVideosControl.ListUnknownVideo = args.Result as List<VideoFile>;
+                    uiResearchControl.uiButtonLaunchExecution.IsEnabled = true;
                 }
             };
 
@@ -56,17 +62,12 @@ namespace SortMyVids
         }
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Console.WriteLine("Recup de la liste");
             List<VideoFile> list = e.Argument as List<VideoFile>;
-            Console.WriteLine("taille : "+list.Count);
 
             foreach (VideoFile v in list)
             {
-                v.searchGenre();
-            }
-            
-            foreach (VideoFile v in list)
-            {
+                v.searchPresumeVideo();
+                
                 if (!v.IsVerified)
                     listTmp.Add(v);
             }

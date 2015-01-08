@@ -152,7 +152,6 @@ namespace SortMyVids
                 }
 
                 file.Close();
-
             }
             catch
             {

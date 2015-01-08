@@ -33,6 +33,12 @@ namespace SortMyVids
 
         TypeMovie genre;
 
+        public TypeMovie Genre
+        {
+            get { return genre; }
+            set { genre = value; }
+        }
+
         public List<VideoFile> PresumeVideo
         {
             get { return presumeVideo; }
@@ -79,7 +85,6 @@ namespace SortMyVids
 
         private void cleanTitle()
         {
-
             presumeVideoName = new List<String>();
 
             string tmpName = videoName;
@@ -88,36 +93,20 @@ namespace SortMyVids
             foreach (string s in ResearchControl.NameMediaFilter)
                 tmpName.Replace(s, "");
 
+            //Seconde step : eliminate '.','-'
+            tmpName.Replace("."," ");
+            tmpName.Replace("-", " ");
+            
             videoName = tmpName;
 
             //Maybe the right title ?
             presumeVideoName.Add(videoName);
             
             //title sometimes delimited by year
-            string[] resultAll = Regex.Split(tmpName, "[0-9]{4}");
-            if(resultAll != null)
+            string[] resultName = Regex.Split(tmpName, "[0-9]{4}");
+            if (resultName != null)
             {
-                //if there is date, get the name separate by '.'
-                string resultName = resultAll[0].Replace('.',' ');
-
-                presumeVideoName.Add(resultName);
-            }
-            //If there is no date, maybe delimited by '-'
-            else
-            {
-                string[] resultName = tmpName.Split('-');
-                
-                if(resultName != null)
-                {
-                    addInPresumeName(resultName);
-                }
-                //Or by '.'
-                else
-                {
-                    string presumeName = tmpName.Replace('.',' ');
-
-                    presumeVideoName.Add(presumeName);
-                }
+                presumeVideoName.Add(resultName[0]);
             }
 
             //Suppression des doublons
@@ -133,14 +122,23 @@ namespace SortMyVids
             }
         }
 
-        public void searchGenre()
+        public void searchPresumeVideo()
         {
-            //cleanTitle();
-            //Task.Factory.StartNew(() => doAction());
-            doAction();
+            doResearchOnOMDB();
+
+            foreach(VideoFile v in presumeVideo)
+            {
+                Match test = Regex.Match(v.VideoName.ToUpper(), "["+videoName+"]");
+                if (test.Success)
+                {
+                    this.videoName = v.VideoName;
+                    this.videoYear = v.VideoYear;
+                    this.isVerified = true;
+                }
+            }
         }
 
-        private void doAction()
+        private void doResearchOnOMDB()
         {
             presumeVideo = new List<VideoFile>();
 
@@ -172,7 +170,7 @@ namespace SortMyVids
 
                 if(titreTrouve != null && anneTrouve != null)
                 {
-                    Console.WriteLine("FILM TROUVE");
+                    Console.WriteLine("FILM TROUVE : " + titreTrouve + " " + anneTrouve);
                     VideoFile v = new VideoFile();
                     v.VideoName = titreTrouve;
                     v.VideoYear = anneTrouve;
@@ -188,7 +186,11 @@ namespace SortMyVids
 
         public override string ToString()
         {
-            return videoName;
+            string tmp = videoName;
+            if(videoYear.Length > 0)
+                tmp += " ("+videoYear+")";
+
+            return tmp;
         }
     }
 }
