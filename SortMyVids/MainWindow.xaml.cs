@@ -21,7 +21,6 @@ namespace SortMyVids
 {
     public partial class MainWindow : Window
     {
-        List<VideoFile> listTmp = new List<VideoFile>();
 
         public MainWindow()
         {
@@ -51,8 +50,13 @@ namespace SortMyVids
                 //Work in UI THREAD
                 else
                 {
-                    uiUnknownVideosControl.ListUnknownVideo = args.Result as List<VideoFile>;
-                    uiResearchControl.uiButtonLaunchExecution.IsEnabled = true;
+                    ListsFromBackWorker listResult = args.Result as ListsFromBackWorker;
+                    if (listResult != null)
+                    {
+                        uiUnknownVideosControl.ListUnknownVideo = listResult.ListUnverified;
+                        uiResearchControl.uiListSortMovie.ItemsSource = listResult.ListVerified;
+                        uiResearchControl.uiButtonLaunchExecution.IsEnabled = true;
+                    }
                 }
             };
 
@@ -64,16 +68,47 @@ namespace SortMyVids
         {
             List<VideoFile> list = e.Argument as List<VideoFile>;
 
+            ListsFromBackWorker listsResul = new ListsFromBackWorker();
+
             foreach (VideoFile v in list)
             {
                 v.searchPresumeVideo();
-                
-                if (!v.IsVerified)
-                    listTmp.Add(v);
+
+                if (v.IsVerified) 
+                {
+                    listsResul.ListVerified.Add(v);
+                }
+                else
+                {
+                    listsResul.ListUnverified.Add(v);
+                }
             }
 
-            e.Result = list;
+            e.Result = listsResul;
+        }
+    }
+
+    public class ListsFromBackWorker
+    {
+        List<VideoFile> listUnverified;
+        List<VideoFile> listVerified;
+
+        internal List<VideoFile> ListUnverified
+        {
+            get { return listUnverified; }
+            set { listUnverified = value; }
+        }
+        internal List<VideoFile> ListVerified
+        {
+            get { return listVerified; }
+            set { listVerified = value; }
         }
 
+
+        public ListsFromBackWorker()
+        {
+            listUnverified = new List<VideoFile>();
+            listVerified = new List<VideoFile>();
+        }
     }
 }

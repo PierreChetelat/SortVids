@@ -91,11 +91,11 @@ namespace SortMyVids
 
             //First step : eliminate false name with filter
             foreach (string s in ResearchControl.NameMediaFilter)
-                tmpName.Replace(s, "");
+                tmpName = tmpName.Replace(s, "");
 
             //Seconde step : eliminate '.','-'
-            tmpName.Replace("."," ");
-            tmpName.Replace("-", " ");
+            tmpName = tmpName.Replace("."," ");
+            tmpName = tmpName.Replace("-", " ");
             
             videoName = tmpName;
 
@@ -106,6 +106,14 @@ namespace SortMyVids
             string[] resultName = Regex.Split(tmpName, "[0-9]{4}");
             if (resultName != null)
             {
+                //Console.WriteLine("FILM " + videoName + " ||||| RECHERCHE DE " + resultName[0]);
+                presumeVideoName.Add(resultName[0]);
+            }
+            //or by the number of film
+            resultName = Regex.Split(tmpName, "[0-9]{1}");
+            if (resultName != null)
+            {
+                //Console.WriteLine("FILM " + videoName + " ||||| RECHERCHE DE " + resultName[0]);
                 presumeVideoName.Add(resultName[0]);
             }
 
@@ -128,12 +136,13 @@ namespace SortMyVids
 
             foreach(VideoFile v in presumeVideo)
             {
-                Match test = Regex.Match(v.VideoName.ToUpper(), "["+videoName+"]");
+                Match test = Regex.Match(v.VideoName.ToUpper(), "["+videoName.ToUpper()+"]");
                 if (test.Success)
                 {
                     this.videoName = v.VideoName;
                     this.videoYear = v.VideoYear;
                     this.isVerified = true;
+                    break;
                 }
             }
         }
@@ -142,46 +151,55 @@ namespace SortMyVids
         {
             presumeVideo = new List<VideoFile>();
 
-            Console.WriteLine("DEBUT RECHERCHE VIDEO " + videoName);
+            //Console.WriteLine("DEBUT RECHERCHE VIDEO " + videoName);
             foreach(string s in presumeVideoName)
             {
                 Console.WriteLine("RECHERCHE DE "+s);
                 
                 string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
 
-                WebRequest request = WebRequest.Create(requete);
-                WebResponse r = request.GetResponse();
-
-                StreamReader objReader = new StreamReader(r.GetResponseStream());
-
-                string sLine = "", result = "";
-
-                while (sLine != null)
+                try
                 {
-                    sLine = objReader.ReadLine();
-                    if (sLine != null)
-                        result += sLine;
+                    WebRequest request = WebRequest.Create(requete);
+                    WebResponse r = request.GetResponse();
+
+                    StreamReader objReader = new StreamReader(r.GetResponseStream());
+
+                    string sLine = "", result = "";
+
+                    while (sLine != null)
+                    {
+                        sLine = objReader.ReadLine();
+                        if (sLine != null)
+                            result += sLine;
+                    }
+
+                    Newtonsoft.Json.Linq.JToken token = Newtonsoft.Json.Linq.JObject.Parse(result);
+
+                    string titreTrouve = (string)token.SelectToken("Title");
+                    string anneTrouve = (string)token.SelectToken("Year");
+                    string genreTrouve = (string)token.SelectToken("Genre");
+
+                    if(titreTrouve != null && anneTrouve != null)
+                    {
+                        //Console.WriteLine("FILM TROUVE : " + titreTrouve + " " + anneTrouve);
+                        VideoFile v = new VideoFile();
+                        v.VideoName = titreTrouve;
+                        v.VideoYear = anneTrouve;
+                        Console.WriteLine("FILM " + titreTrouve + " | GENRE : "+genreTrouve);
+                        presumeVideo.Add(v);
+                    }
+                    objReader.Close();
+                    r.Close();
+                    
                 }
-
-                Newtonsoft.Json.Linq.JToken token = Newtonsoft.Json.Linq.JObject.Parse(result);
-
-                string titreTrouve = (string)token.SelectToken("Title");
-                string anneTrouve = (string)token.SelectToken("Year");
-
-                if(titreTrouve != null && anneTrouve != null)
+                catch
                 {
-                    Console.WriteLine("FILM TROUVE : " + titreTrouve + " " + anneTrouve);
-                    VideoFile v = new VideoFile();
-                    v.VideoName = titreTrouve;
-                    v.VideoYear = anneTrouve;
-
-                    presumeVideo.Add(v);
+                    Console.WriteLine("ERRRRROOOOOOOORRRRRRRR");
                 }
-                objReader.Close();
-                r.Close();
             }
 
-            Console.WriteLine("FIN RECHERCHE VIDEO " + videoName);
+            //Console.WriteLine("FIN RECHERCHE VIDEO " + videoName);
         }
 
         public override string ToString()
