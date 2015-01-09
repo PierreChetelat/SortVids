@@ -28,8 +28,8 @@
 
         <ListBox x:Name="uiListMovie" Grid.Row="2" Grid.RowSpan="2" Margin="10"/>
         <Label x:Name="uiLabelNBVideo" Content="Nb video : 0" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="4"/>
-        <ListBox x:Name="uiListSortMovie" Grid.Row="2" Grid.Column="2" Grid.RowSpan="2" Margin="10"/>
-        
+        <TreeView x:Name="uiTreeSortMovie" Grid.Row="2" Grid.Column="2" Grid.RowSpan="2" Margin="10"/>
+
         <Button x:Name="uiButtonUpdate" Click="uiButtonUpdate_Click" Grid.Row="4" VerticalAlignment="Bottom" Content="MàJ fichier de filtre" Height="20"/>
         <Button x:Name="uiButtonLaunchAnalysis" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Left" Height="20" Width="60" Content="Analyser" />
         <Button x:Name="uiButtonLaunchExecution" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Right" Height="20" Width="60" Content="Executer" IsEnabled="False"/>

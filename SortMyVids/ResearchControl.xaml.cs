@@ -41,6 +41,13 @@ namespace SortMyVids
         }
 
         List<VideoFile> listMyVideos = new List<VideoFile>();
+        List<VideoFile> listVerifiedMyVideos = new List<VideoFile>();
+
+        internal List<VideoFile> ListVerifiedMyVideos
+        {
+            get { return listVerifiedMyVideos; }
+            set { listVerifiedMyVideos = value; }
+        }
 
         internal List<VideoFile> ListMyVideos
         {
@@ -55,6 +62,29 @@ namespace SortMyVids
         {
             InitializeComponent();
             updateFilters();
+        }
+
+        public void fillTreeView()
+        {
+            List<TreeViewItem> listGenre = new List<TreeViewItem>();
+
+            foreach (VideoFile v in listVerifiedMyVideos)
+            {
+                TreeViewItem tmp = new TreeViewItem();
+                tmp.Header = tmp.Name = v.Genre.ToString();
+                TreeViewItem tmp2 = listGenre.Find(x => x.Name == tmp.Name);
+                if (tmp2 != null)
+                {
+                    tmp2.Items.Add(v);
+                }
+                else
+                {
+                    tmp.Items.Add(v);
+                    listGenre.Add(tmp);
+                }
+            }
+
+            uiTreeSortMovie.ItemsSource = listGenre;
         }
 
         private void uiButtonSrc_Click(object sender, RoutedEventArgs e)

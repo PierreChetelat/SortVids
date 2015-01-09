@@ -24,8 +24,12 @@ namespace SortMyVids
             get { return listUnknownVideo; }
             set { listUnknownVideo = value;
                   //Binding view - list
-                  uiListUnknownVideo.ItemsSource = listUnknownVideo;
-                  uiListUnknownVideo.SelectedItem = uiListUnknownVideo.Items.GetItemAt(0);
+                    if(listUnknownVideo.Count > 0)
+                    { 
+                      uiListUnknownVideo.ItemsSource = listUnknownVideo;
+
+                      uiListUnknownVideo.SelectedItem = uiListUnknownVideo.Items.GetItemAt(0);
+                    }
                 }
         }
     

@@ -24,6 +24,12 @@ namespace SortMyVids
     class VideoFile
     {
         String oldPathName, newPathName;
+
+        public String OldPathName
+        {
+            get { return oldPathName; }
+            set { oldPathName = value; }
+        }
         String videoName, videoYear;
         //Utiliser pour rechercher les noms de films possibles
         List<String> presumeVideoName;
@@ -46,7 +52,7 @@ namespace SortMyVids
         public Boolean IsVerified
         {
             get { return isVerified; }
-            set { isVerified = value; }
+            set { isVerified = value;}
         }
 
         public String VideoName
@@ -161,6 +167,7 @@ namespace SortMyVids
                 try
                 {
                     WebRequest request = WebRequest.Create(requete);
+                    
                     WebResponse r = request.GetResponse();
 
                     StreamReader objReader = new StreamReader(r.GetResponseStream());

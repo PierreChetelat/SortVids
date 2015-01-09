@@ -25,6 +25,9 @@ namespace SortMyVids
         public MainWindow()
         {
             InitializeComponent();
+            
+            //For suppress the error from treeview because adding VideoFile instead of treeviewitem
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
             uiResearchControl.uiButtonLaunchAnalysis.Click += uiButtonLaunchAnalysis_Click;
             uiResearchControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
@@ -32,7 +35,25 @@ namespace SortMyVids
 
         void uiButtonLaunchExecution_Click(object sender, RoutedEventArgs e)
         {
+            if(uiResearchControl.uiFolderDest.Text != "")
+            {
+                string folderDest = uiResearchControl.uiFolderDest.Text;
+                List<VideoFile> listToMove = uiResearchControl.ListVerifiedMyVideos;
+                foreach(VideoFile v in listToMove)
+                {
+                    string destinationVideo = folderDest + "\\" + v.Genre.ToString();
+                    if (!System.IO.Directory.Exists(destinationVideo))
+                    {
+                        System.IO.Directory.CreateDirectory(destinationVideo);
+                    }
 
+                    System.IO.Directory.Move(v.OldPathName, destinationVideo + v.VideoName);
+                }
+            }
+            else
+            {
+                uiResearchControl.uiFolderDest.Text = "Indiquer un dossier de destination";
+            }
         }
 
         void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
@@ -54,7 +75,10 @@ namespace SortMyVids
                     if (listResult != null)
                     {
                         uiUnknownVideosControl.ListUnknownVideo = listResult.ListUnverified;
-                        uiResearchControl.uiListSortMovie.ItemsSource = listResult.ListVerified;
+                        uiResearchControl.ListVerifiedMyVideos = listResult.ListVerified;
+
+                        uiResearchControl.fillTreeView();
+
                         uiResearchControl.uiButtonLaunchExecution.IsEnabled = true;
                     }
                 }
@@ -86,6 +110,21 @@ namespace SortMyVids
 
             e.Result = listsResul;
         }
+
+        private List<TreeViewItem> getTreeViewItemGenre()
+        {
+            List<TreeViewItem> listGenre = new List<TreeViewItem>();
+
+            foreach (TypeMovie t in Enum.GetValues(typeof(TypeMovie)) as TypeMovie[])
+            {
+                TreeViewItem tmp = new TreeViewItem();
+                tmp.Header = t.ToString();
+                listGenre.Add(tmp);
+            }
+
+            return listGenre;
+        }
+
     }
 
     public class ListsFromBackWorker
@@ -111,4 +150,5 @@ namespace SortMyVids
             listVerified = new List<VideoFile>();
         }
     }
+
 }
