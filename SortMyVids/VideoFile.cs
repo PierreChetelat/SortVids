@@ -18,7 +18,7 @@ namespace SortMyVids
         Family, Horror, Musical, Romance,
         Sport, War, Adventure, Crime,
         Drama, Fantasy, History, Music, Mystery,
-        Science_Fiction, Thriller, Western, Undefined
+        Sci_Fi, Thriller, Western, Undefined
     }
 
     class VideoFile
@@ -54,7 +54,7 @@ namespace SortMyVids
         public TypeMovie Genre
         {
             get { return genre; }
-            set { genre = value; }
+            set { genre = value;
         }
 
         public List<VideoFile> ListPresumeVideo
@@ -183,8 +183,11 @@ namespace SortMyVids
 
             foreach(string s in setPresumeVideoName)
             {
-                string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
-
+                Console.WriteLine("NAME BEFORE : " + s);
+                string nameForRequest = s.Replace(" ", "+");
+                Console.WriteLine("NAME AFTER : " + nameForRequest);
+                string requete = "http://www.omdbapi.com/?t=" + nameForRequest + "&y=" + videoYear + "&plot=short&r=json";
+                Console.WriteLine("REQUETE "+requete);
                 try
                 {
                     WebRequest request = WebRequest.Create(requete);
@@ -210,7 +213,6 @@ namespace SortMyVids
 
                     if(titreTrouve != null && anneTrouve != null)
                     {
-                        //Console.WriteLine("FILM TROUVE : " + titreTrouve + " " + anneTrouve);
                         VideoFile v = new VideoFile();
                         v.VideoName = titreTrouve;
                         v.VideoYear = anneTrouve;
@@ -221,16 +223,13 @@ namespace SortMyVids
                             {
                                 string tmpGenre = genre.Replace(" ","");
                                 v.listPresumeGenre.Add(getEnumFromString(tmpGenre));
-                                Console.WriteLine("GENRE TROUVE1 " + tmpGenre);
-                                Console.WriteLine("GENRE TROUVE1 enUM " + getEnumFromString(tmpGenre));
                             }
                         }
                         else
                         {
-                            Console.WriteLine("GENRE TROUVE2 " + genreTrouve);
-                            Console.WriteLine("GENRE TROUVE2 enUM " + getEnumFromString(genreTrouve));
                             v.listPresumeGenre.Add(getEnumFromString(genreTrouve));
                         }
+                        v.Genre = v.ListPresumeGenre.First();
                         listPresumeVideo.Add(v);
                     }
                     objReader.Close();
@@ -240,6 +239,7 @@ namespace SortMyVids
                 catch
                 {
                     Console.WriteLine("ERRRRROOOOOOOORRRRRRRR");
+                    Console.WriteLine("FILM " + s);
                 }
             }
 
@@ -248,12 +248,25 @@ namespace SortMyVids
 
         private TypeMovie getEnumFromString(string enumString)
         {
-            TypeMovie genreValue = (TypeMovie)Enum.Parse(typeof(TypeMovie), enumString);
-            if (Enum.IsDefined(typeof(TypeMovie), genreValue))
+            try
             {
-                return genreValue;
+                if(enumString == "Sci-Fi")
+                {
+                    return TypeMovie.Sci_Fi;
+                }
+
+                TypeMovie genreValue = (TypeMovie)Enum.Parse(typeof(TypeMovie), enumString);
+                if (Enum.IsDefined(typeof(TypeMovie), genreValue))
+                {
+                    return genreValue;
+                }
+                return TypeMovie.Undefined;
             }
-            return TypeMovie.Undefined;
+            catch
+            {
+                Console.WriteLine("ERREUR DE " + enumString);
+                return TypeMovie.Undefined;
+            }
         }
 
         public override string ToString()

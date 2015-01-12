@@ -63,7 +63,6 @@ namespace SortMyVids
             {
                 uiComboBoxChoice.Items.Add(tmp);
             }
-            
         }
 
         private void initComboBoxEdit()
@@ -112,7 +111,11 @@ namespace SortMyVids
 
         private void uiListUnknownVideo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-               
+            TreeViewItem tmpDeselect = uiTreeSortMovie.SelectedItem as TreeViewItem;
+            if(tmpDeselect != null)
+            {
+                tmpDeselect.IsSelected = false;
+            }
             Console.WriteLine("SELECTED LIST");
             clearTextEdit();
             doSelectedUnknownList();
@@ -138,6 +141,7 @@ namespace SortMyVids
 
                 if(vNew != null)
                 {
+                    //RAJOUTER GENRE
                     v.VideoName = vNew.VideoName;
                     v.VideoYear = vNew.VideoYear;
                     v.IsVerified = true;
@@ -158,6 +162,7 @@ namespace SortMyVids
 
                 if (title.Length > 0)
                 {
+                    //RAJOUTER GENRE
                     v.VideoName = uiTextTitle.Text;
                     v.VideoYear = uiTextYear.Text;
                     v.IsVerified = true;
@@ -214,7 +219,6 @@ namespace SortMyVids
             uiTextYear.Clear();
             uiComboBoxChoice.Items.Clear();
             uiComboBoxChoiceGenre.Items.Clear();
-            uiComboBoxEdit.Items.Clear();
         }
 
         public void fillTreeView()
