@@ -18,7 +18,7 @@ namespace SortMyVids
         Family, Horror, Musical, Romance,
         Sport, War, Adventure, Crime,
         Drama, Fantasy, History, Music, Mystery,
-        Science_Fiction, Thriller, Western
+        Science_Fiction, Thriller, Western, Undefined
     }
 
     class VideoFile
@@ -34,13 +34,18 @@ namespace SortMyVids
         String videoName, videoYear, videoExtension;
 
         //Utiliser pour rechercher les noms de films possibles
-        HashSet<String> presumeVideoName;
+        HashSet<String> setPresumeVideoName;
         //Remplis par les noms présumé, contient les infos sur les films possibles
-        List<VideoFile> presumeVideo;
+        List<VideoFile> listPresumeVideo;
+        List<TypeMovie> listPresumeGenre;
         Boolean isVerified;
 
         TypeMovie genre;
-
+        public List<TypeMovie> ListPresumeGenre
+        {
+            get { return listPresumeGenre; }
+            set { listPresumeGenre = value; }
+        }
         public String VideoExtension
         {
             get { return videoExtension; }
@@ -52,9 +57,9 @@ namespace SortMyVids
             set { genre = value; }
         }
 
-        public List<VideoFile> PresumeVideo
+        public List<VideoFile> ListPresumeVideo
         {
-            get { return presumeVideo; }
+            get { return listPresumeVideo; }
         }
         public Boolean IsVerified
         {
@@ -76,6 +81,7 @@ namespace SortMyVids
         public VideoFile()
         {
             isVerified = false;
+            listPresumeGenre = new List<TypeMovie>();
         }
 
         public void setPath(string path)
@@ -112,7 +118,7 @@ namespace SortMyVids
 
         private void cleanTitle()
         {
-            presumeVideoName = new HashSet<String>();
+            setPresumeVideoName = new HashSet<String>();
 
             string tmpName = videoName;
 
@@ -127,21 +133,21 @@ namespace SortMyVids
             videoName = tmpName;
 
             //Maybe the right title ?
-            presumeVideoName.Add(videoName);
+            setPresumeVideoName.Add(videoName);
             
             //title sometimes delimited by year
             string[] resultName = Regex.Split(tmpName, "[0-9]{4}");
             if (resultName != null)
             {
                 videoYear = getNumberFromString(tmpName, 4);
-                presumeVideoName.Add(resultName[0]);
+                setPresumeVideoName.Add(resultName[0]);
             }
             //or by the number of film
             resultName = Regex.Split(tmpName, "[0-9]{1}");
             if (resultName != null)
             {
                 string numFilm = getNumberFromString(tmpName, 1);
-                presumeVideoName.Add(resultName[0]+numFilm);
+                setPresumeVideoName.Add(resultName[0]+numFilm);
             }
         }
 
@@ -150,7 +156,7 @@ namespace SortMyVids
             foreach (String s in tab)
             {
                 if(s != null)
-                    presumeVideoName.Add(s);
+                    setPresumeVideoName.Add(s);
             }
         }
 
@@ -158,7 +164,7 @@ namespace SortMyVids
         {
             doResearchOnOMDB();
 
-            foreach(VideoFile v in presumeVideo)
+            foreach(VideoFile v in listPresumeVideo)
             {
                 Match test = Regex.Match(v.VideoName.ToUpper(), "["+videoName.ToUpper()+"]");
                 if (test.Success)
@@ -173,9 +179,9 @@ namespace SortMyVids
 
         private void doResearchOnOMDB()
         {
-            presumeVideo = new List<VideoFile>();
+            listPresumeVideo = new List<VideoFile>();
 
-            foreach(string s in presumeVideoName)
+            foreach(string s in setPresumeVideoName)
             {
                 string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
 
@@ -208,8 +214,24 @@ namespace SortMyVids
                         VideoFile v = new VideoFile();
                         v.VideoName = titreTrouve;
                         v.VideoYear = anneTrouve;
-                        Console.WriteLine("FILM " + titreTrouve + " | GENRE : "+genreTrouve);
-                        presumeVideo.Add(v);
+                        string[] splitGenre = genreTrouve.Split(',');
+                        if(splitGenre.Length > 1)
+                        {
+                            foreach(string genre in splitGenre)
+                            {
+                                string tmpGenre = genre.Replace(" ","");
+                                v.listPresumeGenre.Add(getEnumFromString(tmpGenre));
+                                Console.WriteLine("GENRE TROUVE1 " + tmpGenre);
+                                Console.WriteLine("GENRE TROUVE1 enUM " + getEnumFromString(tmpGenre));
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("GENRE TROUVE2 " + genreTrouve);
+                            Console.WriteLine("GENRE TROUVE2 enUM " + getEnumFromString(genreTrouve));
+                            v.listPresumeGenre.Add(getEnumFromString(genreTrouve));
+                        }
+                        listPresumeVideo.Add(v);
                     }
                     objReader.Close();
                     r.Close();
@@ -222,6 +244,16 @@ namespace SortMyVids
             }
 
             //Console.WriteLine("FIN RECHERCHE VIDEO " + videoName);
+        }
+
+        private TypeMovie getEnumFromString(string enumString)
+        {
+            TypeMovie genreValue = (TypeMovie)Enum.Parse(typeof(TypeMovie), enumString);
+            if (Enum.IsDefined(typeof(TypeMovie), genreValue))
+            {
+                return genreValue;
+            }
+            return TypeMovie.Undefined;
         }
 
         public override string ToString()

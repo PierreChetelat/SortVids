@@ -59,10 +59,11 @@ namespace SortMyVids
         {
             uiComboBoxChoice.Items.Clear();
 
-            foreach (VideoFile tmp in v.PresumeVideo)
+            foreach (VideoFile tmp in v.ListPresumeVideo)
             {
                 uiComboBoxChoice.Items.Add(tmp);
             }
+            
         }
 
         private void initComboBoxEdit()
@@ -83,6 +84,18 @@ namespace SortMyVids
             }
         }
 
+        private void uiComboBoxChoice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            VideoFile v = uiComboBoxChoice.SelectedItem as VideoFile;
+            if(v != null)
+            {
+                foreach(TypeMovie enumMovie in v.ListPresumeGenre)
+                {
+                    uiComboBoxChoiceGenre.Items.Add(enumMovie);
+                }
+            }
+        }
+
         private void uiRadio_Checked(object sender, RoutedEventArgs e)
         {
             if(uiRadioEdit.IsChecked == true)
@@ -99,6 +112,14 @@ namespace SortMyVids
 
         private void uiListUnknownVideo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+               
+            Console.WriteLine("SELECTED LIST");
+            clearTextEdit();
+            doSelectedUnknownList();
+        }
+
+        private void doSelectedUnknownList()
+        {
             VideoFile v = uiListUnknownVideo.SelectedItem as VideoFile;
 
             if (v != null)
@@ -111,37 +132,67 @@ namespace SortMyVids
         private void uiButtonValidateChoice_Click(object sender, RoutedEventArgs e)
         {
             VideoFile v = getSelectedVideoFile();
-            VideoFile vNew = uiComboBoxChoice.SelectedItem as VideoFile;
-
-            if(vNew != null)
+            if(v != null)
             {
-                v.VideoName = vNew.VideoName;
-                v.VideoYear = vNew.VideoYear;
-                v.IsVerified = true;
-                nextSelectedUnknownItem(v);
-            } 
+                VideoFile vNew = uiComboBoxChoice.SelectedItem as VideoFile;
+
+                if(vNew != null)
+                {
+                    v.VideoName = vNew.VideoName;
+                    v.VideoYear = vNew.VideoYear;
+                    v.IsVerified = true;
+                    nextSelectedUnknownItem(v);
+                }
+
+            }
         }
 
         private void uiButtonValidateEdit_Click(object sender, RoutedEventArgs e)
         {
             VideoFile v = getSelectedVideoFile();
 
-            string title = uiTextTitle.Text;
-            string year = uiTextTitle.Text;
+            if(v != null)
+            {
+                string title = uiTextTitle.Text;
+                string year = uiTextTitle.Text;
 
-            if (title.Length > 0) 
-            { 
-                v.VideoName = uiTextTitle.Text;
-                v.VideoYear = uiTextYear.Text;
-                v.IsVerified = true;
-                nextSelectedUnknownItem(v);
+                if (title.Length > 0)
+                {
+                    v.VideoName = uiTextTitle.Text;
+                    v.VideoYear = uiTextYear.Text;
+                    v.IsVerified = true;
+                    nextSelectedUnknownItem(v);
+                }
             }
+
         }    
 
         private VideoFile getSelectedVideoFile()
         {
-            int index = listUnknownVideo.IndexOf(uiListUnknownVideo.SelectedItem as VideoFile);
-            return listUnknownVideo.ElementAt(index);
+            VideoFile v = uiListUnknownVideo.SelectedItem as VideoFile;
+            if(v != null)
+            {
+                int index = listUnknownVideo.IndexOf(v);
+
+                if (index != -1) { 
+                    return listUnknownVideo.ElementAt(index);
+                }
+            }
+           
+            
+            v = uiTreeSortMovie.SelectedItem as VideoFile;
+            if (v != null)
+            {
+                int index = listVerifiedMyVideos.IndexOf(v);
+
+                if (index != -1)
+                {
+                    return listVerifiedMyVideos.ElementAt(index);
+                }
+            }
+            
+
+            return null;
         }
 
         private void nextSelectedUnknownItem(VideoFile v)
@@ -161,6 +212,9 @@ namespace SortMyVids
         {
             uiTextTitle.Clear();
             uiTextYear.Clear();
+            uiComboBoxChoice.Items.Clear();
+            uiComboBoxChoiceGenre.Items.Clear();
+            uiComboBoxEdit.Items.Clear();
         }
 
         public void fillTreeView()
@@ -189,6 +243,11 @@ namespace SortMyVids
 
         private void uiTreeSortMovie_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            Console.WriteLine("SELECTED TREEVIEW");
+            //Deselect item from listview
+            uiListUnknownVideo.SelectedItem = null;
+            uiListUnknownVideo.UpdateLayout();
+
             VideoFile v = uiTreeSortMovie.SelectedItem as VideoFile;
 
             if (v != null)
@@ -197,5 +256,6 @@ namespace SortMyVids
                 initComboBoxEdit(v);
             }
         }
+
     }
 }
