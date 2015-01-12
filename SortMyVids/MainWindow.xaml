@@ -2,13 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:my="clr-namespace:SortMyVids"
-        Title="MainWindow" Height="500" Width="600">
+        Title="SortMyVids" Height="500" Width="600">
     <Grid>
         <TabControl>
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="General"/>
+                        <TextBlock Text="Commencer"/>
                     </StackPanel>
                 </TabItem.Header>
                 <my:ResearchControl x:Name="uiResearchControl" Margin="5"/>
@@ -16,10 +16,10 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Unknown files"/>
+                        <TextBlock Text="Trier films"/>
                     </StackPanel>
                 </TabItem.Header>
-                <my:UnknownVideosControl x:Name="uiUnknownVideosControl" Margin="5"/>
+                <my:SortVideosControl x:Name="uiUnknownVideosControl" Margin="5"/>
             </TabItem>
 
         </TabControl>

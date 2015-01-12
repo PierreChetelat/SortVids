@@ -14,31 +14,38 @@ namespace SortMyVids
 {
     public enum TypeMovie
     {
-        ACTION, ANIMATION, COMEDY, DOCUMENTARY,
-        FAMILY, FILM_NOIR, HORROR, MUSICAL, ROMANCE,
-        SPORT, WAR, ADVENTURE, BIOGRAPHY, CRIME,
-        DRAMA, FANTASY, HISTORY, MUSIC, MYSTERY,
-        SCI_FI, THRILLER, WESTERN
+        Action, Animation, Comedy, Documentary,
+        Family, Horror, Musical, Romance,
+        Sport, War, Adventure, Crime,
+        Drama, Fantasy, History, Music, Mystery,
+        Science_Fiction, Thriller, Western
     }
 
     class VideoFile
     {
-        String oldPathName, newPathName;
+        String oldPathName;
 
         public String OldPathName
         {
             get { return oldPathName; }
             set { oldPathName = value; }
         }
-        String videoName, videoYear;
+
+        String videoName, videoYear, videoExtension;
+
         //Utiliser pour rechercher les noms de films possibles
-        List<String> presumeVideoName;
+        HashSet<String> presumeVideoName;
         //Remplis par les noms présumé, contient les infos sur les films possibles
         List<VideoFile> presumeVideo;
         Boolean isVerified;
 
         TypeMovie genre;
 
+        public String VideoExtension
+        {
+            get { return videoExtension; }
+            set { videoExtension = value; }
+        }
         public TypeMovie Genre
         {
             get { return genre; }
@@ -71,27 +78,41 @@ namespace SortMyVids
             isVerified = false;
         }
 
-        public VideoFile(VideoFile v)
-        {
-            this.videoName = v.videoName;
-            this.oldPathName = v.oldPathName;
-            this.newPathName = v.newPathName;
-            this.genre = v.genre;
-            this.presumeVideoName = v.presumeVideoName.ToList();
-            this.presumeVideo = v.presumeVideo.ToList();
-        }
-
         public void setPath(string path)
         {
             oldPathName = path;
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
+            videoExtension = System.IO.Path.GetExtension(path);
             videoYear = "";
             cleanTitle();
         }
 
+        private string getNumberFromString(string s, int sizeNumber)
+        {
+            string tmpNumber = "";
+            int tmpSize = sizeNumber;
+
+            foreach(char c in s)
+            {
+                int tmpNb;
+                bool result = Int32.TryParse(c+"", out tmpNb);
+                if (result == true)
+                {
+                    tmpNumber += Convert.ToString(tmpNb);
+                    tmpSize--;
+                    if (tmpSize <= 0)
+                        break;
+                }
+            }
+            if (tmpSize > 0)
+                return "";
+            else
+                return tmpNumber;
+        }
+
         private void cleanTitle()
         {
-            presumeVideoName = new List<String>();
+            presumeVideoName = new HashSet<String>();
 
             string tmpName = videoName;
 
@@ -112,19 +133,16 @@ namespace SortMyVids
             string[] resultName = Regex.Split(tmpName, "[0-9]{4}");
             if (resultName != null)
             {
-                //Console.WriteLine("FILM " + videoName + " ||||| RECHERCHE DE " + resultName[0]);
+                videoYear = getNumberFromString(tmpName, 4);
                 presumeVideoName.Add(resultName[0]);
             }
             //or by the number of film
             resultName = Regex.Split(tmpName, "[0-9]{1}");
             if (resultName != null)
             {
-                //Console.WriteLine("FILM " + videoName + " ||||| RECHERCHE DE " + resultName[0]);
-                presumeVideoName.Add(resultName[0]);
+                string numFilm = getNumberFromString(tmpName, 1);
+                presumeVideoName.Add(resultName[0]+numFilm);
             }
-
-            //Suppression des doublons
-            //presumeVideoName = presumeVideoName.Distinct() as List<String>;
         }
 
         private void addInPresumeName(string[] tab)
@@ -157,11 +175,8 @@ namespace SortMyVids
         {
             presumeVideo = new List<VideoFile>();
 
-            //Console.WriteLine("DEBUT RECHERCHE VIDEO " + videoName);
             foreach(string s in presumeVideoName)
             {
-                Console.WriteLine("RECHERCHE DE "+s);
-                
                 string requete = "http://www.omdbapi.com/?t=" + s + "&y="+videoYear+"&plot=short&r=json";
 
                 try

@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 
 namespace SortMyVids
 {
-    public partial class UnknownVideosControl : UserControl
+    public partial class SortVideosControl : UserControl
     {
         private List<VideoFile> listUnknownVideo;
 
@@ -32,8 +32,15 @@ namespace SortMyVids
                     }
                 }
         }
+
+        List<VideoFile> listVerifiedMyVideos = new List<VideoFile>();
+        internal List<VideoFile> ListVerifiedMyVideos
+        {
+            get { return listVerifiedMyVideos; }
+            set { listVerifiedMyVideos = value; }
+        }
     
-        public UnknownVideosControl()
+        public SortVideosControl()
         {
             InitializeComponent();
 
@@ -80,19 +87,13 @@ namespace SortMyVids
         {
             if(uiRadioEdit.IsChecked == true)
             {
-                uiComboBoxChoice.IsEnabled = false;
-                uiButtonValidateChoice.IsEnabled = false;
-                uiTextTitle.IsEnabled = true;
-                uiComboBoxEdit.IsEnabled = true;
-                uiButtonValidateEdit.IsEnabled = true;
+                uiBoderChoice.IsEnabled = false;
+                uiBorderEdit.IsEnabled = true;
             }
             else
             {
-                uiTextTitle.IsEnabled = false;
-                uiComboBoxEdit.IsEnabled = false;
-                uiButtonValidateEdit.IsEnabled = false;
-                uiComboBoxChoice.IsEnabled = true;
-                uiButtonValidateChoice.IsEnabled = true;
+                uiBorderEdit.IsEnabled = false;
+                uiBoderChoice.IsEnabled = true;
             }
         }
 
@@ -117,7 +118,7 @@ namespace SortMyVids
                 v.VideoName = vNew.VideoName;
                 v.VideoYear = vNew.VideoYear;
                 v.IsVerified = true;
-                nextSelectedUnknownItem();
+                nextSelectedUnknownItem(v);
             } 
         }
 
@@ -133,7 +134,7 @@ namespace SortMyVids
                 v.VideoName = uiTextTitle.Text;
                 v.VideoYear = uiTextYear.Text;
                 v.IsVerified = true;
-                nextSelectedUnknownItem();
+                nextSelectedUnknownItem(v);
             }
         }    
 
@@ -143,22 +144,58 @@ namespace SortMyVids
             return listUnknownVideo.ElementAt(index);
         }
 
-        private void nextSelectedUnknownItem()
+        private void nextSelectedUnknownItem(VideoFile v)
         {
-            uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1; 
+            listVerifiedMyVideos.Add(v);
+            ListUnknownVideo.Remove(uiListUnknownVideo.SelectedItem as VideoFile);
+            //int index = uiListUnknownVideo.SelectedIndex;
+            //uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1;
+
             clearTextEdit();
-            
-
-
-
+            //fillTreeView();
             //?????????????????
-            uiListUnknownVideo.UpdateLayout();
+            //uiListUnknownVideo.UpdateLayout();
         }
 
         private void clearTextEdit()
         {
             uiTextTitle.Clear();
             uiTextYear.Clear();
+        }
+
+        public void fillTreeView()
+        {
+            List<TreeViewItem> listGenre = new List<TreeViewItem>();
+
+            foreach (VideoFile v in listVerifiedMyVideos)
+            {
+                TreeViewItem tmp = new TreeViewItem();
+                tmp.Header = tmp.Name = v.Genre.ToString();
+                TreeViewItem tmp2 = listGenre.Find(x => x.Name == tmp.Name);
+                if (tmp2 != null)
+                {
+                    tmp2.Items.Add(v);
+                }
+                else
+                {
+                    tmp.Items.Add(v);
+                    listGenre.Add(tmp);
+                }
+            }
+
+            //uiTreeSortMovie.Items.Clear();
+            uiTreeSortMovie.ItemsSource = listGenre;
+        }
+
+        private void uiTreeSortMovie_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            VideoFile v = uiTreeSortMovie.SelectedItem as VideoFile;
+
+            if (v != null)
+            {
+                initComboBoxChoice(v);
+                initComboBoxEdit(v);
+            }
         }
     }
 }

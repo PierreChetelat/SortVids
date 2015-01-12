@@ -30,7 +30,7 @@ namespace SortMyVids
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
             uiResearchControl.uiButtonLaunchAnalysis.Click += uiButtonLaunchAnalysis_Click;
-            uiResearchControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
+            uiUnknownVideosControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
         }
 
         void uiButtonLaunchExecution_Click(object sender, RoutedEventArgs e)
@@ -38,7 +38,7 @@ namespace SortMyVids
             if(uiResearchControl.uiFolderDest.Text != "")
             {
                 string folderDest = uiResearchControl.uiFolderDest.Text;
-                List<VideoFile> listToMove = uiResearchControl.ListVerifiedMyVideos;
+                List<VideoFile> listToMove = uiUnknownVideosControl.ListVerifiedMyVideos;
                 foreach(VideoFile v in listToMove)
                 {
                     string destinationVideo = folderDest + "\\" + v.Genre.ToString();
@@ -46,8 +46,8 @@ namespace SortMyVids
                     {
                         System.IO.Directory.CreateDirectory(destinationVideo);
                     }
-
-                    System.IO.Directory.Move(v.OldPathName, destinationVideo + v.VideoName);
+                    string destinationFile = destinationVideo + "\\" + v.VideoName + "." + v.VideoExtension;
+                    System.IO.Directory.Move(v.OldPathName, destinationFile);
                 }
             }
             else
@@ -58,34 +58,36 @@ namespace SortMyVids
 
         void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
         {
-            BackgroundWorker bw = new BackgroundWorker();
+            if(uiResearchControl.ListMyVideos.Count > 0)
+            { 
+                BackgroundWorker bw = new BackgroundWorker();
 
-            // define the event handlers, work in other thread
-            bw.DoWork += worker_DoWork;
-            bw.RunWorkerCompleted += (objesender, args) =>
-            {
-                if (args.Error != null)  // if an exception occurred during DoWork
+                // define the event handlers, work in other thread
+                bw.DoWork += worker_DoWork;
+                bw.RunWorkerCompleted += (objesender, args) =>
                 {
-                    //TODO : MESSAGE ERREUR
-                }
-                //Work in UI THREAD
-                else
-                {
-                    ListsFromBackWorker listResult = args.Result as ListsFromBackWorker;
-                    if (listResult != null)
+                    if (args.Error != null)  // if an exception occurred during DoWork
                     {
-                        uiUnknownVideosControl.ListUnknownVideo = listResult.ListUnverified;
-                        uiResearchControl.ListVerifiedMyVideos = listResult.ListVerified;
-
-                        uiResearchControl.fillTreeView();
-
-                        uiResearchControl.uiButtonLaunchExecution.IsEnabled = true;
+                        uiResearchControl.uiLabelNBVideo.Content = "Un problème est survenue pendant la recherche, recommencer";
                     }
-                }
-            };
+                    //Work in UI THREAD
+                    else
+                    {
+                        ListsFromBackWorker listResult = args.Result as ListsFromBackWorker;
+                        if (listResult != null)
+                        {
+                            uiUnknownVideosControl.ListUnknownVideo = listResult.ListUnverified;
+                            uiUnknownVideosControl.ListVerifiedMyVideos = listResult.ListVerified;
 
-            
-            bw.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
+                            uiUnknownVideosControl.fillTreeView();
+
+                            uiUnknownVideosControl.uiButtonLaunchExecution.IsEnabled = true;
+                        }
+                    }
+                };
+
+                bw.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
+            }
 
         }
         private void worker_DoWork(object sender, DoWorkEventArgs e)

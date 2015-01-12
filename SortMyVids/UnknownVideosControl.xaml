@@ -1,40 +1,77 @@
-﻿<UserControl x:Class="SortMyVids.UnknownVideosControl"
+﻿<UserControl x:Class="SortMyVids.SortVideosControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="400" d:DesignWidth="500">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="4*" MinWidth="220"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="2*" MinHeight="80"/>
+            <RowDefinition Height="*" MinHeight="30"/>
+            <RowDefinition Height="*" MinHeight="120"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Liste des films introuvables :"/>
-        <ListBox x:Name="uiListUnknownVideo" SelectionChanged="uiListUnknownVideo_SelectionChanged" Grid.RowSpan="5" Margin="5,30,5,5"/>
-        <RadioButton x:Name="uiRadioChoice" Checked="uiRadio_Checked" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Choix du titre proposé"/>
-        <ComboBox x:Name="uiComboBoxChoice" Grid.Row="1" Grid.Column="2" Height="25"  Margin="5,0,5,0"/>
-        <Button x:Name="uiButtonValidateChoice" Click="uiButtonValidateChoice_Click" Grid.Row="1" Grid.Column="3" Content="Valider" Width="60" Height="25" />
+        <Label Content="Films introuvables"/>
+        <ListBox x:Name="uiListUnknownVideo" SelectionChanged="uiListUnknownVideo_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Margin="5"/>
+        
+        <RadioButton x:Name="uiRadioChoice" Checked="uiRadio_Checked" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Choix du titre proposé"/>
+        <Border x:Name="uiBoderChoice" Grid.Column="2" Grid.Row="1" Background="Gray">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Content="Titre*" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="uiComboBoxChoice" Grid.Column="1" Height="25" HorizontalAlignment="Stretch" Margin="5,0,5,0"/>
+                <Label Content="Genre*" Grid.Row="1" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="uiComboBoxChoiceGenre" Grid.Row="1" Grid.Column="1" Height="25" Width="100" HorizontalAlignment="Center"/>
+                <Button x:Name="uiButtonValidateChoice" Click="uiButtonValidateChoice_Click" Grid.Row="2" Grid.Column="1" Content="Valider" Width="60" Height="25" HorizontalAlignment="Center"/>
 
-        <RadioButton x:Name="uiRadioEdit" Checked="uiRadio_Checked" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Entrer les informations"/>
-        <Label Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Content="*Titre du film :"/>
-        <TextBox x:Name="uiTextTitle" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,0,5,0" Height="25" />
-        <Label Grid.Row="4" Grid.Column="1" Content="Genre :" VerticalAlignment="Top" HorizontalAlignment="Right"/>
-        <ComboBox x:Name="uiComboBoxEdit" Grid.Row="4" Grid.Column="2" Height="25" VerticalAlignment="Top" Margin="5"/>
-        <Label Grid.Row="5" Grid.Column="1" Content="Année :" VerticalAlignment="Top" HorizontalAlignment="Right"/>
-        <TextBox x:Name="uiTextYear" Grid.Row="5" VerticalAlignment="Top" Grid.Column="2" Width="60" HorizontalAlignment="Left" Margin="5,0,0,0" Height="25" />
-        <Button x:Name="uiButtonValidateEdit" Click="uiButtonValidateEdit_Click" Grid.Row="5" Grid.Column="3" Content="Valider" Width="60" Height="25" VerticalAlignment="Top"/>
+            </Grid>
+            
+        </Border>
+
+            <RadioButton x:Name="uiRadioEdit" Checked="uiRadio_Checked" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Entrer les informations"/>
+        <Border x:Name="uiBorderEdit" Grid.Column="2" Grid.Row="3" Background="Gray">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label HorizontalAlignment="Left" Content="Titre du film*"/>
+                <TextBox x:Name="uiTextTitle" Grid.Column="1" Height="25" Margin="5,0,5,0"/>
+                <Label Grid.Row="1" Content="Genre*" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="uiComboBoxEdit" Grid.Row="1" Grid.Column="1" Height="25" Width="100" HorizontalAlignment="Center" />
+                <Label Grid.Row="2" Content="Année" HorizontalAlignment="Left"/>
+                <TextBox x:Name="uiTextYear" Grid.Row="2" Grid.Column="1" Width="60" HorizontalAlignment="Center" Height="25" />
+                <Button x:Name="uiButtonValidateEdit" Click="uiButtonValidateEdit_Click" Grid.Row="3" Grid.Column="1" Content="Valider" Width="60" Height="25" HorizontalAlignment="Center"/>
+            </Grid>
+        </Border>
+        <Label Content="Films triés" Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <TreeView x:Name="uiTreeSortMovie" SelectedItemChanged="uiTreeSortMovie_SelectedItemChanged" Grid.Row="3" Grid.RowSpan="4" Margin="5,30,5,5"/>
+
+        <Button x:Name="uiButtonLaunchExecution" Grid.Row="6" Grid.Column="2" HorizontalAlignment="Center" Height="20" Content="Trier mes films" IsEnabled="False"/>
     </Grid>
 </UserControl>
