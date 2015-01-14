@@ -38,11 +38,17 @@ namespace SortMyVids
 
         List<string> listNameMediaFilter = new List<string>();
 
+        string directorySrc, directoryDest;
+
         public List<string> ListNameMediaFilter
         {
             get { return listNameMediaFilter; }
             set { listNameMediaFilter = value;
                   addFiltersName();
+                  if (ListMyVideos.Count > 0)
+                  {
+                      launchResearchVideoFile();
+                  }
             }
         }
 
@@ -62,7 +68,6 @@ namespace SortMyVids
         }
 
 
-        string directorySrc, directoryDest;
 
         public ResearchControl()
         {
@@ -72,32 +77,42 @@ namespace SortMyVids
 
         private void uiButtonSrc_Click(object sender, RoutedEventArgs e)
         {
+        
             directorySrc = showAndGetFolder();
             uiFolderSrc.Text = directorySrc;
 
             if(directorySrc != "Choisir un dossier")
             {
-                BackgroundWorker bw = new BackgroundWorker();
-                // define the event handlers, work in other thread
-                bw.DoWork += getVideoFile;
-                bw.RunWorkerCompleted += (objesender, args) =>
-                {
-                    if (args.Error != null)  // if an exception occurred during DoWork,
-                    {
-                        uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
-                    }
-                    //Work in UI THREAD
-                    else
-                    {
-                        fillListVideoFile();
-                        uiLabelNBVideo.Content = "Vidéos trouvés : "+listMyVideos.Count;
-                    }
-                };
-
-                uiLabelNBVideo.Content = "Recherche de vidéos...";
-
-                bw.RunWorkerAsync(listNameMediaFilter.ToList());
+                launchResearchVideoFile();
             }
+        }
+
+        private void launchResearchVideoFile()
+        {
+            ListMyVideos.Clear();
+            uiListMovie.Items.Clear();
+
+            BackgroundWorker bw = new BackgroundWorker();
+            // define the event handlers, work in other thread
+            bw.DoWork += getVideoFile;
+            bw.RunWorkerCompleted += (objesender, args) =>
+            {
+                if (args.Error != null)  // if an exception occurred during DoWork,
+                {
+                    uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
+                }
+                //Work in UI THREAD
+                else
+                {
+
+                    fillListVideoFile();
+                    uiLabelNBVideo.Content = "Vidéos trouvés : " + listMyVideos.Count;
+                }
+            };
+
+            uiLabelNBVideo.Content = "Recherche de vidéos...";
+
+            bw.RunWorkerAsync(listNameMediaFilter.ToList());
         }
 
         private void uiButtonDest_Click(object sender, RoutedEventArgs e)
@@ -160,7 +175,8 @@ namespace SortMyVids
                 }
             }
 
-            //System.IO.File.WriteAllLines("./nameFilters.txt", listTmpToWrite);
+            if (listTmpToWrite.Count > 0)
+                System.IO.File.WriteAllLines("./nameFilters.txt", listTmpToWrite);
         }
 
         private void addFiltersExtension()
@@ -175,7 +191,8 @@ namespace SortMyVids
                 }
             }
 
-            System.IO.File.WriteAllLines("./extensionsFilters.txt", listTmpToWrite);
+            if(listTmpToWrite.Count > 0)
+                System.IO.File.WriteAllLines("./extensionsFilters.txt", listTmpToWrite);
         }
 
         private void updateFilters()
@@ -188,7 +205,8 @@ namespace SortMyVids
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    listNameMediaFilter.Add(line);
+                    if(line != "")
+                        listNameMediaFilter.Add(line);
                 }
 
                 file.Close();
@@ -198,6 +216,7 @@ namespace SortMyVids
                 //Valeurs par défauts
                 foreach (string s in mediaName)
                     listNameMediaFilter.Add(s);
+
             }
 
             //Lecture des filtres d'extensions
@@ -208,8 +227,8 @@ namespace SortMyVids
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    listExtensionMediaFilter.Add(line);
-                    Console.WriteLine(line);
+                    if(line != "")
+                        listExtensionMediaFilter.Add(line);
                 }
 
                 file.Close();

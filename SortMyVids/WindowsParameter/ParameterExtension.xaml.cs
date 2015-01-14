@@ -28,11 +28,12 @@ namespace SortMyVids.WindowsParameter
             set { listFilterExtension = value; }
         }
 
-        public ParameterExtension(MainWindow parent, List<String> listExtension)
+        public ParameterExtension(MainWindow parent)
         {
             InitializeComponent();
             owner = parent;
-            listFilterExtension = listExtension;
+            listFilterExtension = owner.uiResearchControl.ListExtensionMediaFilter;
+           
             foreach(string s in listFilterExtension)
             {
                 uiListViewExtension.Items.Add(s);
@@ -61,6 +62,8 @@ namespace SortMyVids.WindowsParameter
                 }
             }
 
+            owner.uiResearchControl.ListExtensionMediaFilter = listFilterExtension;
+
             this.Close();
         }
 
@@ -73,7 +76,7 @@ namespace SortMyVids.WindowsParameter
                 {
                     strToAdd = '.' + strToAdd;
                 }
-                uiListViewExtension.Items.Add(strToAdd);
+                uiListViewExtension.Items.Insert(0,strToAdd);
                 uiTextBox.Text = "";
             }
         }

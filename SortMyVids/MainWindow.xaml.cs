@@ -162,13 +162,13 @@ namespace SortMyVids
 
         private void MenuItemExtension_Click(object sender, RoutedEventArgs e)
         {
-            ParameterExtension windowExtension = new ParameterExtension(this,uiResearchControl.ListExtensionMediaFilter);
+            ParameterExtension windowExtension = new ParameterExtension(this);
             windowExtension.ShowDialog();
         }
 
         private void MenuItemName_Click(object sender, RoutedEventArgs e)
         {
-            ParameterName windowName = new ParameterName(this,uiResearchControl.ListNameMediaFilter);
+            ParameterName windowName = new ParameterName(this);
             windowName.ShowDialog();
         }
     }

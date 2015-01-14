@@ -110,8 +110,7 @@ namespace SortMyVids
 
         private string getNumberFromString(string s, int sizeNumber)
         {
-            string tmpNumber = "";
-            int tmpSize = sizeNumber;
+            int tmpSize = sizeNumber, startIndex = 0;
 
             foreach(char c in s)
             {
@@ -119,16 +118,27 @@ namespace SortMyVids
                 bool result = Int32.TryParse(c+"", out tmpNb);
                 if (result == true)
                 {
-                    tmpNumber += Convert.ToString(tmpNb);
-                    tmpSize--;
-                    if (tmpSize <= 0)
-                        break;
+                    try
+                    {
+                        string sub = s.Substring(startIndex, tmpSize);
+                        if(!sub.Contains(" "))
+                        {
+                            result = Int32.TryParse(sub, out tmpNb);
+                            if(result == true)
+                            {
+                                return s.Substring(startIndex, tmpSize);
+                            }
+                        }
+                    }
+                    catch(System.ArgumentOutOfRangeException e)
+                    {
+                        return "";
+                    }
                 }
+                startIndex++;
             }
-            if (tmpSize > 0)
-                return "";
-            else
-                return tmpNumber;
+        
+            return "";
         }
 
         public void cleanTitle()
@@ -140,8 +150,8 @@ namespace SortMyVids
             //First step : eliminate false name with filter
             foreach (string s in listFilterName)
             {
-                Console.WriteLine(s);
-                tmpName = tmpName.Replace(s, "");
+                if(s != "")
+                    tmpName = tmpName.Replace(s, "");
             }
 
             //Seconde step : eliminate '.','-'
