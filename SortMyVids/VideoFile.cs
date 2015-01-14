@@ -24,6 +24,13 @@ namespace SortMyVids
     class VideoFile
     {
         String oldPathName;
+        List<String> listFilterName;
+
+        public List<String> ListFilterName
+        {
+            get { return listFilterName; }
+            set { listFilterName = value; }
+        }
 
         public String OldPathName
         {
@@ -54,7 +61,7 @@ namespace SortMyVids
         public TypeMovie Genre
         {
             get { return genre; }
-            set { genre = value;
+            set { genre = value; }
         }
 
         public List<VideoFile> ListPresumeVideo
@@ -81,7 +88,16 @@ namespace SortMyVids
         public VideoFile()
         {
             isVerified = false;
+
+            listFilterName = new List<string>();
+            listPresumeVideo = new List<VideoFile>();
             listPresumeGenre = new List<TypeMovie>();
+            setPresumeVideoName = new HashSet<string>();
+        }
+
+        public VideoFile(string path) : this()
+        {
+            setPath(path);
         }
 
         public void setPath(string path)
@@ -90,7 +106,6 @@ namespace SortMyVids
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
             videoExtension = System.IO.Path.GetExtension(path);
             videoYear = "";
-            cleanTitle();
         }
 
         private string getNumberFromString(string s, int sizeNumber)
@@ -116,15 +131,18 @@ namespace SortMyVids
                 return tmpNumber;
         }
 
-        private void cleanTitle()
+        public void cleanTitle()
         {
             setPresumeVideoName = new HashSet<String>();
 
             string tmpName = videoName;
 
             //First step : eliminate false name with filter
-            foreach (string s in ResearchControl.NameMediaFilter)
+            foreach (string s in listFilterName)
+            {
+                Console.WriteLine(s);
                 tmpName = tmpName.Replace(s, "");
+            }
 
             //Seconde step : eliminate '.','-'
             tmpName = tmpName.Replace("."," ");
@@ -171,6 +189,7 @@ namespace SortMyVids
                 {
                     this.videoName = v.VideoName;
                     this.videoYear = v.VideoYear;
+                    this.genre = v.Genre;
                     this.isVerified = true;
                     break;
                 }
@@ -183,9 +202,7 @@ namespace SortMyVids
 
             foreach(string s in setPresumeVideoName)
             {
-                Console.WriteLine("NAME BEFORE : " + s);
                 string nameForRequest = s.Replace(" ", "+");
-                Console.WriteLine("NAME AFTER : " + nameForRequest);
                 string requete = "http://www.omdbapi.com/?t=" + nameForRequest + "&y=" + videoYear + "&plot=short&r=json";
                 Console.WriteLine("REQUETE "+requete);
                 try
@@ -214,6 +231,9 @@ namespace SortMyVids
                     if(titreTrouve != null && anneTrouve != null)
                     {
                         VideoFile v = new VideoFile();
+                        //
+                        v.listPresumeGenre = new List<TypeMovie>();
+                        //
                         v.VideoName = titreTrouve;
                         v.VideoYear = anneTrouve;
                         string[] splitGenre = genreTrouve.Split(',');

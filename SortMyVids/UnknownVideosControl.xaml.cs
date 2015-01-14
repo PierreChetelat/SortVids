@@ -159,12 +159,14 @@ namespace SortMyVids
             {
                 string title = uiTextTitle.Text;
                 string year = uiTextTitle.Text;
+                TypeMovie t = (TypeMovie)uiComboBoxEdit.SelectedItem;
 
-                if (title.Length > 0)
+                if (title.Length > 0 && t != null)
                 {
                     //RAJOUTER GENRE
                     v.VideoName = uiTextTitle.Text;
                     v.VideoYear = uiTextYear.Text;
+                    v.Genre = t;
                     v.IsVerified = true;
                     nextSelectedUnknownItem(v);
                 }
@@ -208,7 +210,7 @@ namespace SortMyVids
             //uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1;
 
             clearTextEdit();
-            //fillTreeView();
+            fillTreeView();
             //?????????????????
             //uiListUnknownVideo.UpdateLayout();
         }

@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel;
+using SortMyVids.WindowsParameter;
 
 namespace SortMyVids
 {
@@ -58,12 +59,21 @@ namespace SortMyVids
 
         void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
         {
-            if(uiResearchControl.ListMyVideos.Count > 0)
-            { 
-                BackgroundWorker bw = new BackgroundWorker();
-
+         
+            BackgroundWorker bw = new BackgroundWorker();
+            
+            if(uiResearchControl.ListMyVideos.Count > 0 && bw.IsBusy == false)
+            {
+                uiResearchControl.uiButtonLaunchAnalysis.Content = "Annuler";
                 // define the event handlers, work in other thread
                 bw.DoWork += worker_DoWork;
+                bw.WorkerReportsProgress = true;
+                //TODO : ARRETER LE WORKER
+                bw.WorkerSupportsCancellation = true;
+                
+                uiResearchControl.uiProgressBarAnalyse.Maximum = uiResearchControl.ListMyVideos.Count;
+
+                bw.ProgressChanged += bw_ProgressChanged;
                 bw.RunWorkerCompleted += (objesender, args) =>
                 {
                     if (args.Error != null)  // if an exception occurred during DoWork
@@ -73,6 +83,8 @@ namespace SortMyVids
                     //Work in UI THREAD
                     else
                     {
+                        uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
+
                         ListsFromBackWorker listResult = args.Result as ListsFromBackWorker;
                         if (listResult != null)
                         {
@@ -88,13 +100,30 @@ namespace SortMyVids
 
                 bw.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
             }
+            else if(bw.IsBusy == true)
+            {
+                //??
+                //bw.CancellationPending = true;
+
+                uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
+            }
 
         }
+
+        void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            uiResearchControl.uiProgressBarAnalyse.Value = (double)e.ProgressPercentage;
+        }
+
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             List<VideoFile> list = e.Argument as List<VideoFile>;
 
             ListsFromBackWorker listsResul = new ListsFromBackWorker();
+
+            //To indicate progress
+            BackgroundWorker bw = sender as BackgroundWorker;
+            int progress = 0;
 
             foreach (VideoFile v in list)
             {
@@ -108,6 +137,10 @@ namespace SortMyVids
                 {
                     listsResul.ListUnverified.Add(v);
                 }
+                progress++;
+
+
+                bw.ReportProgress(progress);
             }
 
             e.Result = listsResul;
@@ -127,6 +160,17 @@ namespace SortMyVids
             return listGenre;
         }
 
+        private void MenuItemExtension_Click(object sender, RoutedEventArgs e)
+        {
+            ParameterExtension windowExtension = new ParameterExtension(this,uiResearchControl.ListExtensionMediaFilter);
+            windowExtension.ShowDialog();
+        }
+
+        private void MenuItemName_Click(object sender, RoutedEventArgs e)
+        {
+            ParameterName windowName = new ParameterName(this,uiResearchControl.ListNameMediaFilter);
+            windowName.ShowDialog();
+        }
     }
 
     public class ListsFromBackWorker

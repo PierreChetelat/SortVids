@@ -4,7 +4,18 @@
         xmlns:my="clr-namespace:SortMyVids"
         Title="SortMyVids" Height="500" Width="600">
     <Grid>
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Menu">
+                <MenuItem Header="Editer extensions vidéo" Click="MenuItemExtension_Click"/>
+                <MenuItem Header="Editer filtres de nom" Click="MenuItemName_Click"/>
+                <MenuItem Header="Quitter"/>
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

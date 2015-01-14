@@ -1,5 +1,0 @@
-.AVI
-.MP4
-.DIVX
-.WMV
-.MKV

@@ -67,6 +67,12 @@
       <DependentUpon>UnknownVideosControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoFile.cs" />
+    <Compile Include="WindowsParameter\ParameterExtension.xaml.cs">
+      <DependentUpon>ParameterExtension.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowsParameter\ParameterName.xaml.cs">
+      <DependentUpon>ParameterName.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -84,6 +90,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UnknownVideosControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowsParameter\ParameterExtension.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowsParameter\ParameterName.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

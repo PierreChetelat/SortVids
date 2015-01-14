@@ -31,16 +31,28 @@ namespace SortMyVids
         static string[] mediaName = {
             "720p","TRUEFRENCH","DVDRip","XviD","DTS","UTT"
         };
+        
+        List<VideoFile> listMyVideos = new List<VideoFile>();
+  
+        List<string> listExtensionMediaFilter = new List<string>();
 
-        static List<string> extensionMediaFilter = new List<string>();
-        static List<string> nameMediaFilter = new List<string>();
+        List<string> listNameMediaFilter = new List<string>();
 
-        public static List<string> NameMediaFilter
+        public List<string> ListNameMediaFilter
         {
-            get { return ResearchControl.nameMediaFilter; }
+            get { return listNameMediaFilter; }
+            set { listNameMediaFilter = value;
+                  addFiltersName();
+            }
         }
 
-        List<VideoFile> listMyVideos = new List<VideoFile>();
+        public List<string> ListExtensionMediaFilter
+        {
+            get { return listExtensionMediaFilter; }
+            set { listExtensionMediaFilter = value;
+                  addFiltersExtension();
+            }
+        }
         
 
         internal List<VideoFile> ListMyVideos
@@ -66,9 +78,8 @@ namespace SortMyVids
             if(directorySrc != "Choisir un dossier")
             {
                 BackgroundWorker bw = new BackgroundWorker();
-
                 // define the event handlers, work in other thread
-                bw.DoWork += (objesender, args) => { getVideoFile(); };
+                bw.DoWork += getVideoFile;
                 bw.RunWorkerCompleted += (objesender, args) =>
                 {
                     if (args.Error != null)  // if an exception occurred during DoWork,
@@ -79,13 +90,13 @@ namespace SortMyVids
                     else
                     {
                         fillListVideoFile();
-                        uiLabelNBVideo.Content = listMyVideos.Count + " vidéo trouvés";
+                        uiLabelNBVideo.Content = "Vidéos trouvés : "+listMyVideos.Count;
                     }
                 };
 
                 uiLabelNBVideo.Content = "Recherche de vidéos...";
 
-                bw.RunWorkerAsync();
+                bw.RunWorkerAsync(listNameMediaFilter.ToList());
             }
         }
 
@@ -110,16 +121,19 @@ namespace SortMyVids
             return "Choisir un dossier";
         }
 
-        private void getVideoFile()
+        private void getVideoFile(object sender, DoWorkEventArgs e)
         {
+            List<string> list = e.Argument as List<string>;
+
             if(directorySrc != null)
             { 
                 foreach (string path in Directory.GetFiles(directorySrc, "*", SearchOption.AllDirectories))
                 {
-                    if (Array.IndexOf(extensionMediaFilter.ToArray(), System.IO.Path.GetExtension(path).ToUpperInvariant()) != -1)
+                    if (Array.IndexOf(listExtensionMediaFilter.ToArray(), System.IO.Path.GetExtension(path).ToUpperInvariant()) != -1)
                     {
-                        VideoFile v = new VideoFile();
-                        v.setPath(path);
+                        VideoFile v = new VideoFile(path);
+                        v.ListFilterName = listNameMediaFilter;
+                        v.cleanTitle();
                         listMyVideos.Add(v);
                     }
                 }
@@ -134,9 +148,34 @@ namespace SortMyVids
             }
         }
 
-        private void uiButtonUpdate_Click(object sender, RoutedEventArgs e)
+        private void addFiltersName()
         {
-            updateFilters();
+            List<string> listTmpToWrite = new List<string>();
+
+            foreach(string s in listNameMediaFilter)
+            {
+                if(!mediaName.Contains(s))
+                {
+                    listTmpToWrite.Add(s);
+                }
+            }
+
+            //System.IO.File.WriteAllLines("./nameFilters.txt", listTmpToWrite);
+        }
+
+        private void addFiltersExtension()
+        {
+            List<string> listTmpToWrite = new List<string>();
+
+            foreach (string s in listExtensionMediaFilter)
+            {
+                if (!mediaExtensions.Contains(s))
+                {
+                    listTmpToWrite.Add(s);
+                }
+            }
+
+            System.IO.File.WriteAllLines("./extensionsFilters.txt", listTmpToWrite);
         }
 
         private void updateFilters()
@@ -149,16 +188,16 @@ namespace SortMyVids
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    nameMediaFilter.Add(line);
+                    listNameMediaFilter.Add(line);
                 }
 
                 file.Close();
             }
-            catch
+            finally
             {
                 //Valeurs par défauts
                 foreach (string s in mediaName)
-                    nameMediaFilter.Add(s);
+                    listNameMediaFilter.Add(s);
             }
 
             //Lecture des filtres d'extensions
@@ -169,17 +208,17 @@ namespace SortMyVids
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    extensionMediaFilter.Add(line);
+                    listExtensionMediaFilter.Add(line);
                     Console.WriteLine(line);
                 }
 
                 file.Close();
             }
-            catch
+            finally
             {
                 //Valeurs par défauts
                 foreach (string s in mediaExtensions)
-                    extensionMediaFilter.Add(s);
+                    listExtensionMediaFilter.Add(s);
             }
         }
     }

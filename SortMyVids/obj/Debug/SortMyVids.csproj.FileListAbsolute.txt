@@ -61,3 +61,7 @@ D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\MainWindow.baml
 D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.g.resources
 D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.Properties.Resources.resources
 D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\SortMyVids.csproj.GenerateResource.Cache
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\WindowsParameter\ParameterExtension.baml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\WindowsParameter\ParameterName.baml
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\WindowsParameter\ParameterExtension.g.cs
+D:\Niveau 3\NET Framework\Projet\SortVids\SortMyVids\obj\Debug\WindowsParameter\ParameterName.g.cs
