@@ -31,7 +31,9 @@ namespace SortMyVids
         static string[] mediaName = {
             "720p","TRUEFRENCH","DVDRip","XviD","DTS","UTT"
         };
-        
+
+        static string[] langAbb = { "VF", "VOSTFR", "VO", "MULTI", "FANSUB" };
+
         List<VideoFile> listMyVideos = new List<VideoFile>();
   
         List<string> listExtensionMediaFilter = new List<string>();
@@ -78,11 +80,12 @@ namespace SortMyVids
         private void uiButtonSrc_Click(object sender, RoutedEventArgs e)
         {
         
-            directorySrc = showAndGetFolder();
-            uiFolderSrc.Text = directorySrc;
-
-            if(directorySrc != "Choisir un dossier")
+            directorySrc = showAndGetFolder(true);
+            
+            if(directorySrc != "")
             {
+                uiFolderSrc.Text = directorySrc;
+
                 launchResearchVideoFile();
             }
         }
@@ -117,23 +120,37 @@ namespace SortMyVids
 
         private void uiButtonDest_Click(object sender, RoutedEventArgs e)
         {
-            directoryDest = showAndGetFolder();
-            uiFolderDest.Text = directoryDest;
+            askForFolderDest();
         }
 
-        private String showAndGetFolder()
+        public void askForFolderDest()
+        {
+            directoryDest = showAndGetFolder(false);
+            if(directoryDest != "")
+                uiFolderDest.Text = directoryDest;
+        }
+
+        private String showAndGetFolder(Boolean isFolderSrc)
         {
             FolderBrowserDialog fBD = new FolderBrowserDialog();
 
             fBD.ShowNewFolderButton = false;
             fBD.RootFolder = System.Environment.SpecialFolder.MyComputer;
+            if(isFolderSrc)
+            {
+                fBD.Description = "Choisir un dossier source";
+            }
+            else
+            {
+                fBD.Description = "Choisir un dossier de destination";
+            }
 
             if (fBD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 return fBD.SelectedPath;
             }
 
-            return "Choisir un dossier";
+            return "";
         }
 
         private void getVideoFile(object sender, DoWorkEventArgs e)

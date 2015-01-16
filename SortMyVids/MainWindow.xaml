@@ -15,7 +15,7 @@
                 <MenuItem Header="Quitter"/>
             </MenuItem>
         </Menu>
-        <TabControl Grid.Row="1">
+        <TabControl x:Name="uiTabControl" Grid.Row="1">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

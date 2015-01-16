@@ -72,6 +72,7 @@
         <Label Content="Films triés" Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
         <TreeView x:Name="uiTreeSortMovie" SelectedItemChanged="uiTreeSortMovie_SelectedItemChanged" Grid.Row="3" Grid.RowSpan="4" Margin="5,30,5,5"/>
 
-        <Button x:Name="uiButtonLaunchExecution" Grid.Row="6" Grid.Column="2" HorizontalAlignment="Center" Height="20" Content="Trier mes films" IsEnabled="False"/>
+        <Button x:Name="uiButtonLaunchExecution" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Center" Height="20" Content="Trier mes films" IsEnabled="False"/>
+        <ProgressBar x:Name="uiProgressBarMove" Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" Height="20"/>
     </Grid>
 </UserControl>

@@ -32,12 +32,6 @@ namespace SortMyVids
             set { listFilterName = value; }
         }
 
-        public String OldPathName
-        {
-            get { return oldPathName; }
-            set { oldPathName = value; }
-        }
-
         String videoName, videoYear, videoExtension;
 
         //Utiliser pour rechercher les noms de films possibles
@@ -48,6 +42,12 @@ namespace SortMyVids
         Boolean isVerified;
 
         TypeMovie genre;
+
+        public String OldPathName
+        {
+            get { return oldPathName; }
+            set { oldPathName = value; }
+        }
         public List<TypeMovie> ListPresumeGenre
         {
             get { return listPresumeGenre; }

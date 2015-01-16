@@ -30,16 +30,22 @@ namespace SortMyVids
             //For suppress the error from treeview because adding VideoFile instead of treeviewitem
             System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 
+            //Add event to buttons Analysis and Launch Sort
             uiResearchControl.uiButtonLaunchAnalysis.Click += uiButtonLaunchAnalysis_Click;
             uiUnknownVideosControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
         }
 
         void uiButtonLaunchExecution_Click(object sender, RoutedEventArgs e)
         {
-            if(uiResearchControl.uiFolderDest.Text != "")
+            if (uiResearchControl.uiFolderDest.Text != "Dossier des films triés")
             {
+                uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Veuillez patienter";
                 string folderDest = uiResearchControl.uiFolderDest.Text;
                 List<VideoFile> listToMove = uiUnknownVideosControl.ListVerifiedMyVideos;
+
+                uiUnknownVideosControl.uiProgressBarMove.Maximum = listToMove.Count;
+                int progress = 0;
+
                 foreach(VideoFile v in listToMove)
                 {
                     string destinationVideo = folderDest + "\\" + v.Genre.ToString();
@@ -47,12 +53,23 @@ namespace SortMyVids
                     {
                         System.IO.Directory.CreateDirectory(destinationVideo);
                     }
-                    string destinationFile = destinationVideo + "\\" + v.VideoName + "." + v.VideoExtension;
+                    string destinationFile = destinationVideo + "\\" + v.VideoName + v.VideoExtension;
                     System.IO.Directory.Move(v.OldPathName, destinationFile);
+                    progress++;
+
+                    uiUnknownVideosControl.uiProgressBarMove.Value = progress;
                 }
+
+                uiResearchControl.ListMyVideos.Clear();
+                uiUnknownVideosControl.ListVerifiedMyVideos.Clear();
+                uiUnknownVideosControl.ListUnknownVideo.Clear();
+
+                uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Trier mes films";
             }
             else
             {
+                uiTabControl.SelectedIndex = 0;
+
                 uiResearchControl.uiFolderDest.Text = "Indiquer un dossier de destination";
             }
         }

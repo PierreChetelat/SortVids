@@ -23,12 +23,14 @@ namespace SortMyVids
         {
             get { return listUnknownVideo; }
             set { listUnknownVideo = value;
-                  //Binding view - list
+                  
                     if(listUnknownVideo.Count > 0)
                     { 
-                      uiListUnknownVideo.ItemsSource = listUnknownVideo;
-
-                      uiListUnknownVideo.SelectedItem = uiListUnknownVideo.Items.GetItemAt(0);
+                        foreach(VideoFile v in listUnknownVideo)
+                        { 
+                            uiListUnknownVideo.Items.Add(v);
+                        }
+                        uiListUnknownVideo.SelectedItem = uiListUnknownVideo.Items.GetItemAt(0);
                     }
                 }
         }
@@ -116,7 +118,7 @@ namespace SortMyVids
             {
                 tmpDeselect.IsSelected = false;
             }
-            Console.WriteLine("SELECTED LIST");
+
             clearTextEdit();
             doSelectedUnknownList();
         }
@@ -127,6 +129,15 @@ namespace SortMyVids
 
             if (v != null)
             {
+                if(v.ListPresumeVideo.Count > 0)
+                {
+                    uiRadioChoice.IsEnabled = true;
+                }
+                else
+                {
+                    uiRadioEdit.IsEnabled = true;
+                }
+
                 initComboBoxChoice(v);
                 initComboBoxEdit(v);
             }
@@ -204,10 +215,13 @@ namespace SortMyVids
 
         private void nextSelectedUnknownItem(VideoFile v)
         {
-            listVerifiedMyVideos.Add(v);
-            ListUnknownVideo.Remove(uiListUnknownVideo.SelectedItem as VideoFile);
-            //int index = uiListUnknownVideo.SelectedIndex;
-            //uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1;
+            if(uiListUnknownVideo.SelectedItem != null)
+            { 
+                listVerifiedMyVideos.Add(v);
+                int index = uiListUnknownVideo.SelectedIndex;
+                uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1;
+                uiListUnknownVideo.Items.RemoveAt(index);
+            }
 
             clearTextEdit();
             fillTreeView();
