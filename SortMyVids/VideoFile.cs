@@ -21,8 +21,11 @@ namespace SortMyVids
         Sci_Fi, Thriller, Western, Undefined
     }
 
+   
     class VideoFile
     {
+        static string[] langAbb = { "VF", "VOSTFR", "VO", "MULTI", "FANSUB" };
+
         String oldPathName;
         List<String> listFilterName;
 
@@ -32,7 +35,7 @@ namespace SortMyVids
             set { listFilterName = value; }
         }
 
-        String videoName, videoYear, videoExtension;
+        String videoName, videoYear, videoExtension, videoLangAbb;
 
         //Utiliser pour rechercher les noms de films possibles
         HashSet<String> setPresumeVideoName;
@@ -106,6 +109,7 @@ namespace SortMyVids
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
             videoExtension = System.IO.Path.GetExtension(path);
             videoYear = "";
+            videoLangAbb = "";
         }
 
         private string getNumberFromString(string s, int sizeNumber)
@@ -147,6 +151,15 @@ namespace SortMyVids
 
             string tmpName = videoName;
 
+
+            foreach(string s in langAbb)
+            {
+                if(tmpName.Contains(s))
+                {
+                    videoLangAbb = s;
+                }
+            }
+
             //First step : eliminate false name with filter
             foreach (string s in listFilterName)
             {
@@ -157,7 +170,8 @@ namespace SortMyVids
             //Seconde step : eliminate '.','-'
             tmpName = tmpName.Replace("."," ");
             tmpName = tmpName.Replace("-", " ");
-            
+            tmpName = tmpName.Trim();
+
             videoName = tmpName;
 
             //Maybe the right title ?
@@ -194,15 +208,23 @@ namespace SortMyVids
 
             foreach(VideoFile v in listPresumeVideo)
             {
-                Match test = Regex.Match(v.VideoName.ToUpper(), "["+videoName.ToUpper()+"]");
-                if (test.Success)
+                try
                 {
-                    this.videoName = v.VideoName;
-                    this.videoYear = v.VideoYear;
-                    this.genre = v.Genre;
-                    this.isVerified = true;
-                    break;
+                    Match test = Regex.Match(v.VideoName.ToUpper(), "[" + videoName.ToUpper() + "]");
+                    if (test.Success)
+                    {
+                        this.videoName = v.VideoName;
+                        this.videoYear = v.VideoYear;
+                        this.genre = v.Genre;
+                        this.isVerified = true;
+                        break;
+                    }
                 }
+                catch(System.ArgumentException e)
+                {
+
+                }
+
             }
         }
 
@@ -212,11 +234,11 @@ namespace SortMyVids
 
             foreach(string s in setPresumeVideoName)
             {
-                string nameForRequest = s.Replace(" ", "+");
-                string requete = "http://www.omdbapi.com/?t=" + nameForRequest + "&y=" + videoYear + "&plot=short&r=json";
-                Console.WriteLine("REQUETE "+requete);
                 try
                 {
+                    string nameForRequest = s.Replace(" ", "+");
+                    string requete = "http://www.omdbapi.com/?t=" + nameForRequest + "&y=" + videoYear + "&plot=short&r=json";
+
                     WebRequest request = WebRequest.Create(requete);
                     
                     WebResponse r = request.GetResponse();
@@ -238,11 +260,11 @@ namespace SortMyVids
                     string anneTrouve = (string)token.SelectToken("Year");
                     string genreTrouve = (string)token.SelectToken("Genre");
 
-                    if(titreTrouve != null && anneTrouve != null)
+                    if(titreTrouve != null && anneTrouve != null && genreTrouve != null)
                     {
                         VideoFile v = new VideoFile();
                         //
-                        v.listPresumeGenre = new List<TypeMovie>();
+                        //v.listPresumeGenre = new List<TypeMovie>();
                         //
                         v.VideoName = titreTrouve;
                         v.VideoYear = anneTrouve;
@@ -259,21 +281,30 @@ namespace SortMyVids
                         {
                             v.listPresumeGenre.Add(getEnumFromString(genreTrouve));
                         }
-                        v.Genre = v.ListPresumeGenre.First();
+
+                        if(v.listPresumeGenre.First() == TypeMovie.Undefined && v.listPresumeGenre.Count > 1)
+                        {
+                            v.Genre = v.listPresumeGenre.ElementAt(1);
+                        }
+                        else
+                        {
+                            v.Genre = v.ListPresumeGenre.First();
+                        }
+
                         listPresumeVideo.Add(v);
                     }
+
                     objReader.Close();
                     r.Close();
                     
                 }
-                catch
+                catch(System.ArgumentException e)
                 {
                     Console.WriteLine("ERRRRROOOOOOOORRRRRRRR");
                     Console.WriteLine("FILM " + s);
                 }
             }
 
-            //Console.WriteLine("FIN RECHERCHE VIDEO " + videoName);
         }
 
         private TypeMovie getEnumFromString(string enumString)
@@ -294,7 +325,6 @@ namespace SortMyVids
             }
             catch
             {
-                Console.WriteLine("ERREUR DE " + enumString);
                 return TypeMovie.Undefined;
             }
         }
@@ -302,8 +332,19 @@ namespace SortMyVids
         public override string ToString()
         {
             string tmp = videoName;
-            if(videoYear.Length > 0)
-                tmp += " ("+videoYear+")";
+
+            if(videoLangAbb != null)
+            {
+                if (videoLangAbb.Length > 0)
+                    tmp += " " + videoLangAbb;
+            }
+
+            if(videoYear != null)
+            {
+                if (videoYear.Length > 0)
+                    tmp += " (" + videoYear + ")";
+            }
+
 
             return tmp;
         }

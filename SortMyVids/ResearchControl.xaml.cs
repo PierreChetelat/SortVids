@@ -32,8 +32,6 @@ namespace SortMyVids
             "720p","TRUEFRENCH","DVDRip","XviD","DTS","UTT"
         };
 
-        static string[] langAbb = { "VF", "VOSTFR", "VO", "MULTI", "FANSUB" };
-
         List<VideoFile> listMyVideos = new List<VideoFile>();
   
         List<string> listExtensionMediaFilter = new List<string>();

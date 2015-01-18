@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="500">
+             d:DesignHeight="400" d:DesignWidth="500" SizeChanged="UserControl_SizeChanged">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
@@ -70,7 +70,8 @@
             </Grid>
         </Border>
         <Label Content="Films triés" Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-        <TreeView x:Name="uiTreeSortMovie" SelectedItemChanged="uiTreeSortMovie_SelectedItemChanged" Grid.Row="3" Grid.RowSpan="4" Margin="5,30,5,5"/>
+        
+        <TreeView x:Name="uiTreeSortMovie" SelectedItemChanged="uiTreeSortMovie_SelectedItemChanged" Grid.Row="3" Grid.RowSpan="4" Margin="5,25,5,10"/>
 
         <Button x:Name="uiButtonLaunchExecution" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Center" Height="20" Content="Trier mes films" IsEnabled="False"/>
         <ProgressBar x:Name="uiProgressBarMove" Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" Height="20"/>

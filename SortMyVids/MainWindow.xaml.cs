@@ -23,6 +23,8 @@ namespace SortMyVids
     public partial class MainWindow : Window
     {
 
+        private BackgroundWorker backWorker = new BackgroundWorker();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -70,34 +72,35 @@ namespace SortMyVids
             {
                 uiTabControl.SelectedIndex = 0;
 
-                uiResearchControl.uiFolderDest.Text = "Indiquer un dossier de destination";
+                uiResearchControl.askForFolderDest();
             }
         }
 
         void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
         {
-         
-            BackgroundWorker bw = new BackgroundWorker();
-            
-            if(uiResearchControl.ListMyVideos.Count > 0 && bw.IsBusy == false)
+
+            if (uiResearchControl.ListMyVideos.Count > 0 && backWorker.IsBusy == false)
             {
                 uiResearchControl.uiButtonLaunchAnalysis.Content = "Annuler";
                 // define the event handlers, work in other thread
-                bw.DoWork += worker_DoWork;
-                bw.WorkerReportsProgress = true;
-                //TODO : ARRETER LE WORKER
-                bw.WorkerSupportsCancellation = true;
+                backWorker.DoWork += worker_DoWork;
+                backWorker.WorkerReportsProgress = true;
+                backWorker.WorkerSupportsCancellation = true;
                 
                 uiResearchControl.uiProgressBarAnalyse.Maximum = uiResearchControl.ListMyVideos.Count;
 
-                bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerCompleted += (objesender, args) =>
+                backWorker.ProgressChanged += bw_ProgressChanged;
+                backWorker.RunWorkerCompleted += (objesender, args) =>
                 {
-                    if (args.Error != null)  // if an exception occurred during DoWork
+                    //Work in UI THREAD
+                    if (args.Error != null)
                     {
                         uiResearchControl.uiLabelNBVideo.Content = "Un problème est survenue pendant la recherche, recommencer";
                     }
-                    //Work in UI THREAD
+                    else if(args.Cancelled)
+                    {
+                        uiResearchControl.uiProgressBarAnalyse.Value = 0;
+                    }
                     else
                     {
                         uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
@@ -111,16 +114,18 @@ namespace SortMyVids
                             uiUnknownVideosControl.fillTreeView();
 
                             uiUnknownVideosControl.uiButtonLaunchExecution.IsEnabled = true;
+
+                            uiUnknownVideosControl.uiListUnknownVideo.SelectedIndex = 0;
+                            uiTabControl.SelectedIndex = 1;
                         }
                     }
                 };
 
-                bw.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
+                backWorker.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
             }
-            else if(bw.IsBusy == true)
+            else if (backWorker.IsBusy == true)
             {
-                //??
-                //bw.CancellationPending = true;
+                backWorker.CancelAsync();
 
                 uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
             }
@@ -144,9 +149,15 @@ namespace SortMyVids
 
             foreach (VideoFile v in list)
             {
+                if (bw.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    break;
+                }
+
                 v.searchPresumeVideo();
 
-                if (v.IsVerified) 
+                if (v.IsVerified)
                 {
                     listsResul.ListVerified.Add(v);
                 }
@@ -155,8 +166,7 @@ namespace SortMyVids
                     listsResul.ListUnverified.Add(v);
                 }
                 progress++;
-
-
+              
                 bw.ReportProgress(progress);
             }
 

@@ -51,10 +51,7 @@ namespace SortMyVids
             //Choix de base
             uiRadioChoice.IsChecked = true;
 
-            //initComboBoxChoice();
             initComboBoxEdit();
-
-            
         }
         
         private void initComboBoxChoice(VideoFile v)
@@ -65,6 +62,13 @@ namespace SortMyVids
             {
                 uiComboBoxChoice.Items.Add(tmp);
             }
+
+            if(v.ListPresumeVideo.Count > 0)
+            {
+                uiComboBoxChoice.SelectedItem = uiComboBoxChoice.Items.IndexOf(v);
+                uiRadioChoice.IsChecked = true;
+            }
+
         }
 
         private void initComboBoxEdit()
@@ -150,10 +154,10 @@ namespace SortMyVids
             {
                 VideoFile vNew = uiComboBoxChoice.SelectedItem as VideoFile;
 
-                if(vNew != null)
+                if(vNew != null && uiComboBoxChoiceGenre.SelectedItem != null)
                 {
-                    //RAJOUTER GENRE
                     v.VideoName = vNew.VideoName;
+                    v.Genre = (TypeMovie)uiComboBoxChoiceGenre.SelectedItem;
                     v.VideoYear = vNew.VideoYear;
                     v.IsVerified = true;
                     nextSelectedUnknownItem(v);
@@ -174,7 +178,6 @@ namespace SortMyVids
 
                 if (title.Length > 0 && t != null)
                 {
-                    //RAJOUTER GENRE
                     v.VideoName = uiTextTitle.Text;
                     v.VideoYear = uiTextYear.Text;
                     v.Genre = t;
@@ -224,9 +227,8 @@ namespace SortMyVids
             }
 
             clearTextEdit();
-            fillTreeView();
-            //?????????????????
-            //uiListUnknownVideo.UpdateLayout();
+            //fillTreeView();
+            addInTreeView(v);
         }
 
         private void clearTextEdit()
@@ -235,6 +237,30 @@ namespace SortMyVids
             uiTextYear.Clear();
             uiComboBoxChoice.Items.Clear();
             uiComboBoxChoiceGenre.Items.Clear();
+        }
+
+        private void addInTreeView(VideoFile v)
+        {
+            string genre = v.Genre.ToString();
+            bool isPut = false;
+
+            foreach(TreeViewItem item in uiTreeSortMovie.Items)
+            {
+                if(item.Header == genre)
+                {
+                    item.Items.Add(v);
+                    isPut = true;
+                }
+            }
+
+            if(!isPut)
+            {
+                TreeViewItem item = new TreeViewItem();
+                item.Header = genre;
+                item.Items.Add(v);
+                uiTreeSortMovie.Items.Add(item);
+            }
+            
         }
 
         public void fillTreeView()
@@ -257,13 +283,14 @@ namespace SortMyVids
                 }
             }
 
-            //uiTreeSortMovie.Items.Clear();
-            uiTreeSortMovie.ItemsSource = listGenre;
+            foreach(TreeViewItem item in listGenre)
+            {
+                uiTreeSortMovie.Items.Add(item);
+            }
         }
 
         private void uiTreeSortMovie_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            Console.WriteLine("SELECTED TREEVIEW");
             //Deselect item from listview
             uiListUnknownVideo.SelectedItem = null;
             uiListUnknownVideo.UpdateLayout();
@@ -275,6 +302,14 @@ namespace SortMyVids
                 initComboBoxChoice(v);
                 initComboBoxEdit(v);
             }
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double actualHeight = this.ActualHeight;
+            actualHeight -= 60;
+            actualHeight /= 8;
+            uiTreeSortMovie.MaxHeight = actualHeight * 4;
         }
 
     }
