@@ -62,13 +62,6 @@ namespace SortMyVids
             {
                 uiComboBoxChoice.Items.Add(tmp);
             }
-
-            if(v.ListPresumeVideo.Count > 0)
-            {
-                uiComboBoxChoice.SelectedItem = uiComboBoxChoice.Items.IndexOf(v);
-                uiRadioChoice.IsChecked = true;
-            }
-
         }
 
         private void initComboBoxEdit()
@@ -133,17 +126,9 @@ namespace SortMyVids
 
             if (v != null)
             {
-                if(v.ListPresumeVideo.Count > 0)
-                {
-                    uiRadioChoice.IsEnabled = true;
-                }
-                else
-                {
-                    uiRadioEdit.IsEnabled = true;
-                }
-
                 initComboBoxChoice(v);
                 initComboBoxEdit(v);
+                chooseRadioChecked(v);
             }
         }
 
@@ -222,12 +207,29 @@ namespace SortMyVids
             { 
                 listVerifiedMyVideos.Add(v);
                 int index = uiListUnknownVideo.SelectedIndex;
-                uiListUnknownVideo.SelectedIndex = uiListUnknownVideo.SelectedIndex + 1;
+                uiListUnknownVideo.SelectedIndex = index + 1;
                 uiListUnknownVideo.Items.RemoveAt(index);
+            }
+            else
+            {
+                VideoFile vTmp = uiTreeSortMovie.SelectedItem as VideoFile;
+                if(vTmp != null)
+                {
+                    int indexOfGenre = uiTreeSortMovie.Items.IndexOf(vTmp.Genre);
+
+                    TreeViewItem itemGenre = uiTreeSortMovie.Items.GetItemAt(indexOfGenre) as TreeViewItem;
+
+                    if(itemGenre != null)
+                    {
+                        itemGenre.Items.Remove(vTmp);
+                    }
+                    
+                    listVerifiedMyVideos.Remove(vTmp);
+                    listVerifiedMyVideos.Add(v);
+                }
             }
 
             clearTextEdit();
-            //fillTreeView();
             addInTreeView(v);
         }
 
@@ -301,6 +303,20 @@ namespace SortMyVids
             {
                 initComboBoxChoice(v);
                 initComboBoxEdit(v);
+
+                chooseRadioChecked(v);
+            }
+        }
+
+        private void chooseRadioChecked(VideoFile v)
+        {
+            if (v.ListPresumeVideo.Count > 0)
+            {
+                uiRadioChoice.IsChecked = true;
+            }
+            else
+            {
+                uiRadioEdit.IsChecked = true;
             }
         }
 

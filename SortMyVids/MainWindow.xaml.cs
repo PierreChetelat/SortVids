@@ -41,6 +41,25 @@ namespace SortMyVids
         {
             if (uiResearchControl.uiFolderDest.Text != "Dossier des films triés")
             {
+                backWorker.DoWork += worker_DoSortVideo;
+                backWorker.WorkerReportsProgress = true;
+                backWorker.WorkerSupportsCancellation = true;
+                backWorker.ProgressChanged += worker_ProgressChangedSortVideo;
+                backWorker.RunWorkerCompleted += (objesender, args) =>
+                {
+                    if(args.Error != null)
+                    {
+
+                    }
+                    else if(args.Cancelled)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                };
                 uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Veuillez patienter";
                 string folderDest = uiResearchControl.uiFolderDest.Text;
                 List<VideoFile> listToMove = uiUnknownVideosControl.ListVerifiedMyVideos;
@@ -50,16 +69,25 @@ namespace SortMyVids
 
                 foreach(VideoFile v in listToMove)
                 {
-                    string destinationVideo = folderDest + "\\" + v.Genre.ToString();
-                    if (!System.IO.Directory.Exists(destinationVideo))
+                    try
                     {
-                        System.IO.Directory.CreateDirectory(destinationVideo);
-                    }
-                    string destinationFile = destinationVideo + "\\" + v.VideoName + v.VideoExtension;
-                    System.IO.Directory.Move(v.OldPathName, destinationFile);
-                    progress++;
+                        string destinationVideo = folderDest + "\\" + v.Genre.ToString();
+                        if (!System.IO.Directory.Exists(destinationVideo))
+                        {
+                            System.IO.Directory.CreateDirectory(destinationVideo);
+                        }
+                        string destinationFile = destinationVideo + "\\" + v.ToString() + v.VideoExtension;
+                        System.IO.Directory.Move(v.OldPathName, destinationFile);
+                        progress++;
 
-                    uiUnknownVideosControl.uiProgressBarMove.Value = progress;
+                        uiUnknownVideosControl.uiProgressBarMove.Value = progress;
+                    }
+                    catch (System.NotSupportedException error)
+                    {
+                        Console.WriteLine("ERREUR DE VIDEO "+v.ToString());
+                        Console.WriteLine("Chemin " + v.OldPathName);
+                        Console.WriteLine(error.Message + " \n " + error.InnerException + " \n "+error.Data);
+                    }
                 }
 
                 uiResearchControl.ListMyVideos.Clear();
@@ -83,13 +111,13 @@ namespace SortMyVids
             {
                 uiResearchControl.uiButtonLaunchAnalysis.Content = "Annuler";
                 // define the event handlers, work in other thread
-                backWorker.DoWork += worker_DoWork;
+                backWorker.DoWork += worker_DoSearchVideo;
                 backWorker.WorkerReportsProgress = true;
                 backWorker.WorkerSupportsCancellation = true;
                 
                 uiResearchControl.uiProgressBarAnalyse.Maximum = uiResearchControl.ListMyVideos.Count;
 
-                backWorker.ProgressChanged += bw_ProgressChanged;
+                backWorker.ProgressChanged += worker_ProgressChangedSearchVideo;
                 backWorker.RunWorkerCompleted += (objesender, args) =>
                 {
                     //Work in UI THREAD
@@ -103,8 +131,6 @@ namespace SortMyVids
                     }
                     else
                     {
-                        uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
-
                         ListsFromBackWorker listResult = args.Result as ListsFromBackWorker;
                         if (listResult != null)
                         {
@@ -119,6 +145,8 @@ namespace SortMyVids
                             uiTabControl.SelectedIndex = 1;
                         }
                     }
+
+                    uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
                 };
 
                 backWorker.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
@@ -132,12 +160,12 @@ namespace SortMyVids
 
         }
 
-        void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        void worker_ProgressChangedSearchVideo(object sender, ProgressChangedEventArgs e)
         {
             uiResearchControl.uiProgressBarAnalyse.Value = (double)e.ProgressPercentage;
         }
 
-        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        private void worker_DoSearchVideo(object sender, DoWorkEventArgs e)
         {
             List<VideoFile> list = e.Argument as List<VideoFile>;
 
@@ -171,6 +199,15 @@ namespace SortMyVids
             }
 
             e.Result = listsResul;
+        }
+
+        private void worker_DoSortVideo(object sender, DoWorkEventArgs e)
+        {
+
+        }
+
+        void worker_ProgressChangedSortVideo(object sender, ProgressChangedEventArgs e)
+        { 
         }
 
         private List<TreeViewItem> getTreeViewItemGenre()

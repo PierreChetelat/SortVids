@@ -14,11 +14,9 @@ namespace SortMyVids
 {
     public enum TypeMovie
     {
-        Action, Animation, Comedy, Documentary,
-        Family, Horror, Musical, Romance,
-        Sport, War, Adventure, Crime,
-        Drama, Fantasy, History, Music, Mystery,
-        Sci_Fi, Thriller, Western, Undefined
+        Action, Adventure, Animation, Comedy, Crime, Documentary,
+        Drama, Family, Fantasy, History, Horror, Musical, Music, Mystery, 
+        Romance, Sci_Fi, Sport, Thriller, War, Western, Undefined
     }
 
    
@@ -35,7 +33,8 @@ namespace SortMyVids
             set { listFilterName = value; }
         }
 
-        String videoName, videoYear, videoExtension, videoLangAbb;
+        String videoName, videoYear, videoExtension;
+        List<String> videoLangAbb;
 
         //Utiliser pour rechercher les noms de films possibles
         HashSet<String> setPresumeVideoName;
@@ -96,6 +95,7 @@ namespace SortMyVids
             listPresumeVideo = new List<VideoFile>();
             listPresumeGenre = new List<TypeMovie>();
             setPresumeVideoName = new HashSet<string>();
+            videoLangAbb = new List<string>();
         }
 
         public VideoFile(string path) : this()
@@ -109,7 +109,6 @@ namespace SortMyVids
             videoName = System.IO.Path.GetFileNameWithoutExtension(path);
             videoExtension = System.IO.Path.GetExtension(path);
             videoYear = "";
-            videoLangAbb = "";
         }
 
         private string getNumberFromString(string s, int sizeNumber)
@@ -156,7 +155,7 @@ namespace SortMyVids
             {
                 if(tmpName.Contains(s))
                 {
-                    videoLangAbb = s;
+                    videoLangAbb.Add(s);
                 }
             }
 
@@ -333,13 +332,15 @@ namespace SortMyVids
         {
             string tmp = videoName;
 
-            if(videoLangAbb != null)
+            if (videoLangAbb.Count > 0)
             {
-                if (videoLangAbb.Length > 0)
-                    tmp += " " + videoLangAbb;
+                foreach (string s in videoLangAbb)
+                {
+                    tmp += " " + s;
+                }
             }
-
-            if(videoYear != null)
+            
+            if(videoYear != "")
             {
                 if (videoYear.Length > 0)
                     tmp += " (" + videoYear + ")";
