@@ -209,28 +209,22 @@ namespace SortMyVids
                 int index = uiListUnknownVideo.SelectedIndex;
                 uiListUnknownVideo.SelectedIndex = index + 1;
                 uiListUnknownVideo.Items.RemoveAt(index);
+
+                addInTreeView(v);
             }
             else
             {
                 VideoFile vTmp = uiTreeSortMovie.SelectedItem as VideoFile;
+
                 if(vTmp != null)
                 {
-                    int indexOfGenre = uiTreeSortMovie.Items.IndexOf(vTmp.Genre);
-
-                    TreeViewItem itemGenre = uiTreeSortMovie.Items.GetItemAt(indexOfGenre) as TreeViewItem;
-
-                    if(itemGenre != null)
-                    {
-                        itemGenre.Items.Remove(vTmp);
-                    }
-                    
                     listVerifiedMyVideos.Remove(vTmp);
                     listVerifiedMyVideos.Add(v);
+                    fillTreeView();
                 }
             }
 
             clearTextEdit();
-            addInTreeView(v);
         }
 
         private void clearTextEdit()
@@ -248,7 +242,7 @@ namespace SortMyVids
 
             foreach(TreeViewItem item in uiTreeSortMovie.Items)
             {
-                if(item.Header == genre)
+                if(item.Header.ToString() == genre)
                 {
                     item.Items.Add(v);
                     isPut = true;
@@ -267,6 +261,8 @@ namespace SortMyVids
 
         public void fillTreeView()
         {
+            uiTreeSortMovie.Items.Clear();
+
             List<TreeViewItem> listGenre = new List<TreeViewItem>();
 
             foreach (VideoFile v in listVerifiedMyVideos)

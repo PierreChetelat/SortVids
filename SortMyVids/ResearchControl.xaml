@@ -29,6 +29,6 @@
         <Label x:Name="uiLabelNBVideo" Content="Vidéos trouvés : 0" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="2"/>
 
         <ProgressBar x:Name="uiProgressBarAnalyse" Grid.Row="4" Height="15" VerticalAlignment="Bottom" Margin="5"/>
-        <Button x:Name="uiButtonLaunchAnalysis" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Width="60" Content="Analyser"/>
+        <Button x:Name="uiButtonLaunchAnalysis" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Top" Height="25" Width="60" Content="Analyser"/>
      </Grid>
 </UserControl>

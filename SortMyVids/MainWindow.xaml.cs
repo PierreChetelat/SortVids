@@ -37,10 +37,14 @@ namespace SortMyVids
             uiUnknownVideosControl.uiButtonLaunchExecution.Click += uiButtonLaunchExecution_Click;
         }
 
+        /*
+         * Le clic sur le bouton de trie des films instancie un backgroundworker, et lui fournit la liste trié ainsi que le dossier de destination
+         * */
         void uiButtonLaunchExecution_Click(object sender, RoutedEventArgs e)
         {
-            if (uiResearchControl.uiFolderDest.Text != "Dossier des films triés")
+            if (uiResearchControl.uiFolderDest.Text != "Dossier des films triés" && backWorker.IsBusy == false)
             {
+                backWorker = new BackgroundWorker();
                 backWorker.DoWork += worker_DoSortVideo;
                 backWorker.WorkerReportsProgress = true;
                 backWorker.WorkerSupportsCancellation = true;
@@ -49,52 +53,38 @@ namespace SortMyVids
                 {
                     if(args.Error != null)
                     {
-
+                        System.Windows.MessageBox.Show(this, "Une erreur s'est produite pendant la copie !", "Information");
                     }
                     else if(args.Cancelled)
                     {
-
+                        System.Windows.MessageBox.Show(this, "Vous avez annulé l'opération !", "Information");
                     }
                     else
                     {
+                        uiResearchControl.ListMyVideos.Clear();
+                        uiUnknownVideosControl.ListVerifiedMyVideos.Clear();
+                        uiUnknownVideosControl.ListUnknownVideo.Clear();
+                        uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Trier mes films !!!";
+                        uiUnknownVideosControl.uiButtonLaunchExecution.IsEnabled = false;
 
+                        System.Windows.MessageBox.Show(this, "Tous les films ont été triés !", "Information");
+                        uiUnknownVideosControl.uiProgressBarMove.Value = 0;
                     }
                 };
+
                 uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Veuillez patienter";
-                string folderDest = uiResearchControl.uiFolderDest.Text;
-                List<VideoFile> listToMove = uiUnknownVideosControl.ListVerifiedMyVideos;
 
-                uiUnknownVideosControl.uiProgressBarMove.Maximum = listToMove.Count;
-                int progress = 0;
+                ListToBackWorker listAndFolder = new ListToBackWorker();
+                listAndFolder.DestinationFolder = uiResearchControl.uiFolderDest.Text;
+                listAndFolder.ListToMove = uiUnknownVideosControl.ListVerifiedMyVideos.ToList();
 
-                foreach(VideoFile v in listToMove)
-                {
-                    try
-                    {
-                        string destinationVideo = folderDest + "\\" + v.Genre.ToString();
-                        if (!System.IO.Directory.Exists(destinationVideo))
-                        {
-                            System.IO.Directory.CreateDirectory(destinationVideo);
-                        }
-                        string destinationFile = destinationVideo + "\\" + v.ToString() + v.VideoExtension;
-                        System.IO.Directory.Move(v.OldPathName, destinationFile);
-                        progress++;
+                uiUnknownVideosControl.uiProgressBarMove.Maximum = listAndFolder.ListToMove.Count;
 
-                        uiUnknownVideosControl.uiProgressBarMove.Value = progress;
-                    }
-                    catch (System.NotSupportedException error)
-                    {
-                        Console.WriteLine("ERREUR DE VIDEO "+v.ToString());
-                        Console.WriteLine("Chemin " + v.OldPathName);
-                        Console.WriteLine(error.Message + " \n " + error.InnerException + " \n "+error.Data);
-                    }
-                }
-
-                uiResearchControl.ListMyVideos.Clear();
-                uiUnknownVideosControl.ListVerifiedMyVideos.Clear();
-                uiUnknownVideosControl.ListUnknownVideo.Clear();
-
-                uiUnknownVideosControl.uiButtonLaunchExecution.Content = "Trier mes films";
+                backWorker.RunWorkerAsync(listAndFolder);
+            }
+            else if(backWorker.IsBusy)
+            {
+                backWorker.CancelAsync();
             }
             else
             {
@@ -104,6 +94,50 @@ namespace SortMyVids
             }
         }
 
+        /*
+         * Méthode du backgroundworker de trie des vidéos
+         * */
+        private void worker_DoSortVideo(object sender, DoWorkEventArgs e)
+        {
+            ListToBackWorker listAndFolder = e.Argument as ListToBackWorker;
+
+            string folderDest = listAndFolder.DestinationFolder;
+            List<VideoFile> listToMove = listAndFolder.ListToMove;
+
+            BackgroundWorker bw = sender as BackgroundWorker;
+            int progress = 0;
+
+            foreach (VideoFile v in listToMove)
+            {
+                try
+                {
+                    string destinationVideo = System.IO.Path.Combine(folderDest, v.Genre.ToString());
+                    if (!System.IO.Directory.Exists(destinationVideo))
+                    {
+                        System.IO.Directory.CreateDirectory(destinationVideo);
+                    }
+                    string destinationFile = System.IO.Path.Combine(destinationVideo, (v.ToString() + v.VideoExtension));
+                    System.IO.Directory.Move(v.OldPathName, destinationFile);
+
+                }
+                catch (System.NotSupportedException)
+                {
+                }
+                progress++;
+
+                bw.ReportProgress(progress);
+            }
+        }
+
+        void worker_ProgressChangedSortVideo(object sender, ProgressChangedEventArgs e)
+        {
+            uiUnknownVideosControl.uiProgressBarMove.Value = (double)e.ProgressPercentage;
+        }
+
+
+        /*
+         * Un clic sur le bouton analyser lance un backgroundworker et lance les recherches sur internet
+         * */
         void uiButtonLaunchAnalysis_Click(object sender, RoutedEventArgs e)
         {
 
@@ -111,6 +145,8 @@ namespace SortMyVids
             {
                 uiResearchControl.uiButtonLaunchAnalysis.Content = "Annuler";
                 // define the event handlers, work in other thread
+
+                backWorker = new BackgroundWorker();
                 backWorker.DoWork += worker_DoSearchVideo;
                 backWorker.WorkerReportsProgress = true;
                 backWorker.WorkerSupportsCancellation = true;
@@ -123,11 +159,11 @@ namespace SortMyVids
                     //Work in UI THREAD
                     if (args.Error != null)
                     {
-                        uiResearchControl.uiLabelNBVideo.Content = "Un problème est survenue pendant la recherche, recommencer";
+                        System.Windows.MessageBox.Show(this, "Une erreur s'est produite pendant la recherche !", "Information");
                     }
                     else if(args.Cancelled)
                     {
-                        uiResearchControl.uiProgressBarAnalyse.Value = 0;
+                        System.Windows.MessageBox.Show(this, "Vous avez annulé l'opération de recherche !", "Information");                        
                     }
                     else
                     {
@@ -147,6 +183,7 @@ namespace SortMyVids
                     }
 
                     uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
+                    uiResearchControl.uiProgressBarAnalyse.Value = 0;
                 };
 
                 backWorker.RunWorkerAsync(uiResearchControl.ListMyVideos.ToList());
@@ -154,8 +191,6 @@ namespace SortMyVids
             else if (backWorker.IsBusy == true)
             {
                 backWorker.CancelAsync();
-
-                uiResearchControl.uiButtonLaunchAnalysis.Content = "Analyser";
             }
 
         }
@@ -171,7 +206,6 @@ namespace SortMyVids
 
             ListsFromBackWorker listsResul = new ListsFromBackWorker();
 
-            //To indicate progress
             BackgroundWorker bw = sender as BackgroundWorker;
             int progress = 0;
 
@@ -201,14 +235,7 @@ namespace SortMyVids
             e.Result = listsResul;
         }
 
-        private void worker_DoSortVideo(object sender, DoWorkEventArgs e)
-        {
 
-        }
-
-        void worker_ProgressChangedSortVideo(object sender, ProgressChangedEventArgs e)
-        { 
-        }
 
         private List<TreeViewItem> getTreeViewItemGenre()
         {
@@ -224,6 +251,7 @@ namespace SortMyVids
             return listGenre;
         }
 
+        //Fenetres de configuration de nom et d'extension
         private void MenuItemExtension_Click(object sender, RoutedEventArgs e)
         {
             ParameterExtension windowExtension = new ParameterExtension(this);
@@ -234,6 +262,32 @@ namespace SortMyVids
         {
             ParameterName windowName = new ParameterName(this);
             windowName.ShowDialog();
+        }
+    }
+
+    //Classe utilisé pour passer et recevoir des informations du backgroundworker
+    public class ListToBackWorker
+    {
+        List<VideoFile> listToMove;
+        string destinationFolder;
+
+        internal List<VideoFile> ListToMove
+        {
+            get { return listToMove; }
+            set { listToMove = value; }
+        }
+  
+
+        public string DestinationFolder
+        {
+            get { return destinationFolder; }
+            set { destinationFolder = value; }
+        }
+
+        public ListToBackWorker()
+        {
+            listToMove = new List<VideoFile>();
+            destinationFolder = "";
         }
     }
 

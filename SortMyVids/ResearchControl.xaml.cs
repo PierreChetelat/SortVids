@@ -100,12 +100,11 @@ namespace SortMyVids
             {
                 if (args.Error != null)  // if an exception occurred during DoWork,
                 {
-                    uiLabelNBVideo.Content = "Erreur lors de la recherche de vidéos";
+                    System.Windows.MessageBox.Show("Une erreur s'est produite pendant la recherche !", "Information");
                 }
                 //Work in UI THREAD
                 else
                 {
-
                     fillListVideoFile();
                     uiLabelNBVideo.Content = "Vidéos trouvés : " + listMyVideos.Count;
                 }
